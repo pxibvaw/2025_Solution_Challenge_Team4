@@ -11,6 +11,10 @@ venv/
 # ===== Environment Variables =====
 .env
 
+# ===== GCP Service Account Keys =====
+doran-stt.json
+*.credentials.json
+
 # ===== macOS =====
 .DS_Store
 .AppleDouble
@@ -21,3 +25,5 @@ venv/
 
 # ===== Logs =====
 *.log
+
+data/chroma/
