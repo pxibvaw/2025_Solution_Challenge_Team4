@@ -1,0 +1,289 @@
+/* src/styles/PageViewer.css */
+
+.page-viewer-page {
+  width: 420px;
+
+  margin: 0 auto;
+
+  min-height: 100vh;
+
+  background: #f3f1ed;
+
+  box-sizing: border-box;
+
+  font-family: "SF Pro Rounded";
+}
+
+/* =========================
+   reader
+========================= */
+
+.page-viewer-reader {
+  width: 100%;
+
+  min-height: 100vh;
+
+  background: #ffffff;
+
+  position: relative;
+
+  overflow: hidden;
+
+  transition: all 0.2s ease;
+}
+
+/* UI 열렸을 때 */
+
+.page-viewer-reader.open {
+  background: #ffffff;
+}
+
+/* =========================
+   클릭 영역
+========================= */
+
+.page-viewer-click-left,
+.page-viewer-click-center,
+.page-viewer-click-right {
+  position: absolute;
+
+  top: 0;
+
+  height: 100%;
+
+  z-index: 5;
+}
+
+.page-viewer-click-left {
+  left: 0;
+
+  width: 28%;
+}
+
+.page-viewer-click-center {
+  left: 28%;
+
+  width: 44%;
+}
+
+.page-viewer-click-right {
+  right: 0;
+
+  width: 28%;
+}
+
+/* =========================
+   topbar
+========================= */
+
+.page-viewer-topbar {
+  position: absolute;
+
+  top: 0;
+
+  left: 0;
+
+  width: 100%;
+
+  height: 155px;
+
+  padding: 89px 20px 12px;
+
+  box-sizing: border-box;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  background: #f9f5ee;
+
+  transform: translateY(-100%);
+
+  opacity: 0;
+
+  transition: all 0.25s ease;
+
+  z-index: 20;
+}
+
+.page-viewer-topbar.show {
+  transform: translateY(0);
+
+  opacity: 1;
+}
+
+.page-viewer-back-btn {
+  border: none;
+
+  background: transparent;
+
+  padding: 0;
+
+  cursor: pointer;
+}
+
+.page-viewer-back-icon {
+  width: 24px;
+
+  height: 24px;
+
+  object-fit: contain;
+}
+
+.page-viewer-top-center {
+  position: absolute;
+
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  text-align: center;
+}
+
+.page-viewer-top-chapter {
+  margin: 0 0 4px;
+
+  color: #352e28;
+
+  font-size: 16px;
+
+  font-weight: 700;
+}
+
+.page-viewer-top-page {
+  margin: 0;
+
+  color: #9d8f84;
+
+  font-size: 12px;
+
+  font-weight: 500;
+}
+
+.page-viewer-bookmark {
+  border: none;
+
+  background: transparent;
+
+  padding: 0;
+
+  cursor: pointer;
+}
+
+.page-viewer-top-icon {
+  width: 24px;
+
+  height: 24px;
+
+  object-fit: contain;
+
+  opacity: 0.7;
+}
+
+.page-viewer-top-icon.active {
+  opacity: 1;
+}
+
+/* =========================
+   content
+========================= */
+
+.page-viewer-content-area {
+  padding: 96px 24px 140px;
+}
+
+.page-viewer-chapter {
+  color: #352e28;
+
+  font-size: 28px;
+
+  font-weight: 700;
+
+  line-height: 150%;
+
+  margin: 0 0 42px;
+}
+
+.page-viewer-content {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 22px;
+}
+
+.page-viewer-text {
+  color: #4a3a2d;
+
+  font-weight: 500;
+
+  line-height: 200%;
+
+  margin: 0;
+
+  word-break: keep-all;
+
+  transition: font-size 0.2s ease;
+}
+
+/* =========================
+   bottom
+========================= */
+
+.page-viewer-bottombar {
+  position: absolute;
+
+  bottom: 0;
+
+  left: 0;
+
+  transform: translateY(100%);
+
+  width: 100%;
+
+  height: 82px;
+
+  background: #f9f5ee;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-around;
+
+  transition: all 0.25s ease;
+
+  z-index: 20;
+}
+
+.page-viewer-bottombar.show {
+  transform: translateY(0);
+}
+
+.page-viewer-bottombar button {
+  border: none;
+
+  background: transparent;
+
+  color: #352e28;
+
+  cursor: pointer;
+}
+
+.page-viewer-bottom-icon {
+  width: 24px;
+
+  height: 24px;
+
+  object-fit: contain;
+}
+
+.page-viewer-font-btn {
+  font-size: 18px;
+
+  font-weight: 700;
+
+  color: #4a3a2d;
+}

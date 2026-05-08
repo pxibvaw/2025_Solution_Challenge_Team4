@@ -1,0 +1,175 @@
+/* =========================
+   로그 페이지
+========================= */
+
+.log-page {
+
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+
+  height: 100%;
+
+  background: #fffbf5;
+
+  padding: 56px 24px 48px;
+
+  box-sizing: border-box;
+
+  overflow-y: auto;
+
+  overscroll-behavior: contain;
+
+  z-index: 999;
+
+}
+
+/* 🔥 상단 LOG 텍스트 */
+.log-page-title {
+  color: #C4BCB3;
+
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 140%;
+
+  margin-bottom: 28px;
+}
+
+/* 🔥 전체 컨테이너 제거 느낌 */
+.log-container {
+  width: 100%;
+  padding-top: 32px;
+}
+
+/* 🔥 제목 */
+.log-title {
+  align-self: stretch;
+
+  color: #4A3A2D;
+
+  font-family: "SF Pro Rounded";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 140%;
+
+  margin-bottom: 8px;
+}
+
+/* 🔥 날짜 */
+.log-date {
+  color: #7A6A5C;
+
+  font-family: "SF Pro Rounded";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+
+  margin-bottom: 44px;
+}
+
+/* 🔥 메시지 리스트 */
+.log-messages {
+  display: flex;
+  flex-direction: column;
+
+  gap: 34px;
+}
+
+/* 🔥 메시지 그룹 */
+.log-message-group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 🔥 화자 */
+.log-speaker {
+  color: #4A3A2D;
+
+  font-family: "SF Pro Rounded";
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%;
+
+  margin-bottom: 12px;
+}
+
+/* 🔥 공통 말풍선 */
+.log-bubble {
+  max-width: 320px;
+
+  padding: 18px 20px;
+
+  border-radius: 16px;
+
+  font-family: "SF Pro Rounded";
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 160%;
+
+  word-break: keep-all;
+}
+
+/* 🔥 AI */
+.log-bubble-ai {
+  align-self: flex-start;
+
+  background: #E8E0D5;
+
+  color: #4A3A2D;
+}
+
+/* 🔥 USER */
+.log-bubble-user {
+  align-self: flex-end;
+
+  background: #7A6A5C;
+
+  color: #FFF;
+}
+
+/* 🔥 시간 */
+.log-time {
+  color: #4A3A2D;
+
+  font-family: "SF Pro Rounded";
+  font-size: 12px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%;
+
+  margin-top: 10px;
+}
+
+/* 🔥 버튼 영역 */
+.log-footer {
+  margin-top: 60px;
+  width: 100%;
+}
+
+/* 🔥 닫기 버튼 */
+.log-close-btn {
+  display: block;
+  margin: 0 auto; 
+
+  width: 320px;
+  height: 60px;
+
+  border: none;
+  border-radius: 999px;
+
+  background: #6E5847;
+  color: #FFF;
+
+  font-family: "SF Pro Rounded";
+  font-size: 20px;
+  font-weight: 700;
+
+  cursor: pointer;
+}
