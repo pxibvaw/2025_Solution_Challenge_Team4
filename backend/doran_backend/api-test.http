@@ -1,0 +1,184 @@
+@host = http://localhost:8080
+@userId = 1
+@sessionId = replace-after-start
+@requestId = 11111111-1111-1111-1111-111111111111
+@essayId = replace-after-generate
+
+### 1. Onboarding
+POST {{host}}/users/onboarding?userId={{userId}}
+Content-Type: application/json
+
+{
+  "userTitle": "윤서",
+  "ageGroup": "SENIOR_70S",
+  "speechLevel": "HONORIFIC",
+  "hasChildren": true,
+  "happiestMoment": "손주가 태어났을 때",
+  "coreValues": ["가족"],
+  "extraValue": "정"
+}
+
+### 2. Profile
+GET {{host}}/users/profile?userId={{userId}}
+
+### 3. LLM Profile Context
+GET {{host}}/users/profile/context?userId={{userId}}
+
+### 4. Complete Guide
+POST {{host}}/users/guide/complete?userId={{userId}}
+
+### 5. Home
+GET {{host}}/home?userId={{userId}}
+
+### 6. Start Interview
+POST {{host}}/interview/start
+Content-Type: application/json
+
+{
+  "userId": {{userId}},
+  "clientTs": "2026-05-04T12:00:00"
+}
+
+### 7. Interview Turn
+POST {{host}}/interview/turn
+Content-Type: application/json
+
+{
+  "sessionId": "{{sessionId}}",
+  "userId": {{userId}},
+  "requestId": "{{requestId}}",
+  "input": {
+    "mode": "TEXT",
+    "userText": "1975년에 처음 자전거를 탔던 기억이 납니다."
+  },
+  "context": {
+    "speechLevel": "HONORIFIC",
+    "ageGroup": "SENIOR_70S",
+    "coreValues": ["가족"],
+    "extraValue": "정"
+  },
+  "clientTs": "2026-05-04T12:01:00"
+}
+
+### 8. Same Turn Again - Idempotency Check
+POST {{host}}/interview/turn
+Content-Type: application/json
+
+{
+  "sessionId": "{{sessionId}}",
+  "userId": {{userId}},
+  "requestId": "{{requestId}}",
+  "input": {
+    "mode": "TEXT",
+    "userText": "1975년에 처음 자전거를 탔던 기억이 납니다."
+  },
+  "context": {
+    "speechLevel": "HONORIFIC",
+    "ageGroup": "SENIOR_70S",
+    "coreValues": ["가족"],
+    "extraValue": "정"
+  },
+  "clientTs": "2026-05-04T12:01:00"
+}
+
+### 9. Chat Logs
+GET {{host}}/chat/sessions/{{sessionId}}/turns
+
+### 10. Generate Essay
+POST {{host}}/essays/generate
+Content-Type: application/json
+
+{
+  "sessionId": "{{sessionId}}",
+  "userId": {{userId}},
+  "title": "첫 자전거",
+  "representativeYear": 1975,
+  "category": "청춘"
+}
+
+### 11. Essay Detail
+GET {{host}}/essays/{{essayId}}
+
+### 12. Library
+GET {{host}}/library?userId={{userId}}
+
+### 13. Library Filter By Year
+GET {{host}}/library?userId={{userId}}&year=1975
+
+### 14. Library Search
+GET {{host}}/library?userId={{userId}}&query=자전거
+
+### 15. Add Comment
+POST {{host}}/essays/{{essayId}}/comments
+Content-Type: application/json
+
+{
+  "authorName": "가족",
+  "content": "이 이야기를 남겨주셔서 고마워요."
+}
+
+### 16. Comments
+GET {{host}}/essays/{{essayId}}/comments
+
+### 17. Share Essay
+POST {{host}}/essays/{{essayId}}/share?userId={{userId}}
+
+### 18. End Interview
+POST {{host}}/interview/end
+Content-Type: application/json
+
+{
+  "sessionId": "{{sessionId}}",
+  "userId": {{userId}},
+  "endReason": "USER_EXIT"
+}
+
+### 19. Error Case - Missing Required Parameter
+GET {{host}}/users/profile
+
+### 20. Error Case - Invalid Onboarding extraValue length
+POST {{host}}/users/onboarding?userId={{userId}}
+Content-Type: application/json
+
+{
+  "userTitle": "윤서",
+  "ageGroup": "SENIOR_70S",
+  "speechLevel": "HONORIFIC",
+  "hasChildren": true,
+  "coreValues": ["가족"],
+  "extraValue": "너무긴기타가치"
+}
+
+### 21. Error Case - Blank Interview Turn Text
+POST {{host}}/interview/turn
+Content-Type: application/json
+
+{
+  "sessionId": "{{sessionId}}",
+  "userId": {{userId}},
+  "requestId": "22222222-2222-2222-2222-222222222222",
+  "input": {
+    "mode": "TEXT",
+    "userText": " "
+  },
+  "context": {
+    "speechLevel": "HONORIFIC"
+  }
+}
+
+### 22. Error Case - Turn After Ended Session
+POST {{host}}/interview/turn
+Content-Type: application/json
+
+{
+  "sessionId": "{{sessionId}}",
+  "userId": {{userId}},
+  "requestId": "33333333-3333-3333-3333-333333333333",
+  "input": {
+    "mode": "TEXT",
+    "userText": "종료 후 호출 테스트입니다."
+  },
+  "context": {
+    "speechLevel": "HONORIFIC"
+  }
+}
