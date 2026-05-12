@@ -141,6 +141,50 @@ class DoranBackendApplicationTests {
 		mockMvc.perform(get("/home").param("userId", "1"))
 				.andExpect(status().isOk());
 
+		mockMvc.perform(post("/api/ai/episodes")
+						.contentType(MediaType.APPLICATION_JSON)
+						.content("""
+								{
+								  "sessionId": "%s",
+								  "userId": "1",
+								  "newEpisodes": [
+								    {
+								      "turn_start": 0,
+								      "turn_end": 1,
+								      "title": "첫 자전거의 기억",
+								      "type": "KEY_SCENE",
+								      "theme": "청춘",
+								      "emotion_tone": "설렘",
+								      "narrative": "처음 자전거를 타던 날의 기억이 선명하게 남아 있습니다.",
+								      "source_session_id": "%s",
+								      "source_turn_range": [0, 1],
+								      "source_facts": ["처음 자전거를 탔다"],
+								      "importance_score": 5.0,
+								      "quality": {
+								        "faithfulness_score": 0.9,
+								        "coverage_score": 0.8,
+								        "emotional_authenticity": 4.0,
+								        "sensory_vividness": 3.5,
+								        "personal_voice": 4.0,
+								        "narrative_flow": 4.0,
+								        "narrative_richness": 0.82,
+								        "quality_grade": "GOOD",
+								        "needs_regeneration": false
+								      }
+								    }
+								  ],
+								  "mergedEpisodes": [],
+								  "episodesCreated": 1,
+								  "episodesMerged": 0,
+								  "weakEpisodes": 0,
+								  "warnings": []
+								}
+								""".formatted(sessionId, sessionId)))
+				.andExpect(status().isOk());
+
+		mockMvc.perform(get("/api/episodes").param("userId", "1"))
+				.andExpect(status().isOk());
+
 		mockMvc.perform(post("/interview/end")
 						.contentType(MediaType.APPLICATION_JSON)
 						.content("""

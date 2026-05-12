@@ -18,4 +18,16 @@ public class AiClientConfig {
     public EssayAiClient essayAiClient() {
         return new DummyEssayAiClient();
     }
+
+    @Bean
+    @ConditionalOnMissingBean(AiSessionClient.class)
+    public AiSessionClient aiSessionClient() {
+        return new DummyAiSessionClient();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(AiAutobiographyClient.class)
+    public AiAutobiographyClient aiAutobiographyClient() {
+        return new DummyAiAutobiographyClient();
+    }
 }

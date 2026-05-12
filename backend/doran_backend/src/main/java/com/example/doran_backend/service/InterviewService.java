@@ -3,6 +3,7 @@ package com.example.doran_backend.service;
 import com.example.doran_backend.dto.*;
 import com.example.doran_backend.ai.InterviewAiClient;
 import com.example.doran_backend.ai.InterviewAiResult;
+import com.example.doran_backend.ai.AiSessionClient;
 import com.example.doran_backend.entity.InterviewSession;
 import com.example.doran_backend.entity.TurnLog;
 import com.example.doran_backend.entity.UserProfile;
@@ -25,6 +26,7 @@ public class InterviewService {
     private final UserProfileRepository userProfileRepository;
     private final OnboardingService onboardingService;
     private final InterviewAiClient interviewAiClient;
+    private final AiSessionClient aiSessionClient;
 
     // -------------------------
     // 1) 인터뷰 시작
@@ -71,6 +73,7 @@ public class InterviewService {
 
         session.end(request.getEndReason());
         interviewSessionRepository.save(session);
+        notifyAiEndSession(session);
 
         return new InterviewEndResponse(session.getSessionId(), session.getStatus());
     }
@@ -230,6 +233,14 @@ public class InterviewService {
     private void requireNonNull(Object value, String message) {
         if (value == null) {
             throw new IllegalArgumentException(message);
+        }
+    }
+
+    private void notifyAiEndSession(InterviewSession session) {
+        try {
+            aiSessionClient.endSession(session.getSessionId(), String.valueOf(session.getUserId()));
+        } catch (RuntimeException ignored) {
+            // Session end must remain stable even if the optional AI service is unavailable.
         }
     }
 }
