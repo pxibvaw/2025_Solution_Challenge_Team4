@@ -91,3 +91,136 @@ root/
 ├── ai/            # AI Pipeline
 ├── README.md
 └── .gitignore
+
+---
+
+## 통합 브랜치 로컬 실행 가이드
+
+이 섹션은 `feat/full-integration` 기준입니다. 프론트엔드, 백엔드, AI 코드가 한 레포에 합쳐진 상태에서 로컬로 화면과 API를 확인하는 방법입니다.
+
+### 1. 브랜치 확인
+
+```bash
+git switch feat/full-integration
+git pull origin feat/full-integration
+```
+
+### 2. PostgreSQL 실행
+
+백엔드는 PostgreSQL을 사용합니다. Docker가 켜져 있어야 합니다.
+
+```bash
+cd backend/doran_backend
+docker compose up -d postgres
+```
+
+기본 DB 설정은 다음과 같습니다.
+
+```text
+host: 127.0.0.1
+port: 15432
+database: doran
+username: doran
+password: doran
+```
+
+### 3. 백엔드 실행
+
+```bash
+cd backend/doran_backend
+./gradlew bootRun
+```
+
+백엔드 실행 확인 URL:
+
+```text
+API Server: http://localhost:8080
+Swagger UI: http://localhost:8080/swagger-ui.html
+OpenAPI JSON: http://localhost:8080/v3/api-docs
+```
+
+### 4. 프론트엔드 실행
+
+처음 한 번만 의존성을 설치합니다.
+
+```bash
+cd frontend
+npm ci
+```
+
+개발 서버 실행:
+
+```bash
+npm run dev
+```
+
+프론트 실행 확인 URL:
+
+```text
+http://localhost:5173
+```
+
+환경에 따라 Vite가 아래 주소로 열릴 수도 있습니다.
+
+```text
+http://127.0.0.1:5173
+```
+
+### 5. 빌드/테스트 확인
+
+백엔드 테스트:
+
+```bash
+cd backend/doran_backend
+./gradlew test
+```
+
+프론트 빌드:
+
+```bash
+cd frontend
+npm run build
+```
+
+현재 통합 브랜치에서 확인된 상태:
+
+```text
+backend ./gradlew test: 성공
+frontend npm run build: 성공
+```
+
+### 6. 현재 동작 범위
+
+현재 프론트 화면은 열어서 확인할 수 있습니다. 다만 프론트의 일부 화면은 아직 백엔드 API와 완전히 연결되지 않았고, `frontend/src/mock/data.ts`의 mock 데이터를 사용합니다.
+
+예를 들어 에피소드/책 화면에 미리 보이는 데이터는 실제 DB에서 생성된 데이터가 아니라 프론트 화면 확인용 더미 데이터입니다.
+
+백엔드 실제 에피소드 API는 다음 주소로 확인할 수 있습니다.
+
+```text
+GET http://localhost:8080/api/episodes?userId=1
+```
+
+### 7. AI 서버 연동
+
+기본 설정에서는 백엔드가 dummy AI client를 사용합니다.
+
+실제 AI FastAPI 서버와 붙여서 확인하려면 AI 서버를 `http://localhost:8000`에 띄운 뒤 백엔드를 아래 환경변수와 함께 실행합니다.
+
+```bash
+AI_SERVICE_ENABLED=true AI_SERVICE_BASE_URL=http://localhost:8000 ./gradlew bootRun
+```
+
+AI 서버 실행 방법과 상세 계약은 아래 문서를 참고합니다.
+
+```text
+docs/BACKEND_INTEGRATION_GUIDE.md
+docs/DORAN_INTEGRATION_GUIDE.md
+```
+
+### 8. 주의사항
+
+- 카카오 로그인은 아직 실제 OAuth/JWT 연동 전입니다.
+- 프론트의 mock 데이터 제거/디자인 수정은 FE 담당자가 처리합니다.
+- 실제 AI 응답, 자서전 생성 품질, 이미지 생성, 음성/STT/TTS는 AI 담당 파트와 추가 연동이 필요합니다.
+- `node_modules/`, `dist/`, 백엔드 build 산출물은 커밋하지 않습니다.
