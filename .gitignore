@@ -27,3 +27,6 @@ doran-stt.json
 *.log
 
 data/chroma/
+# ===== Node / Frontend =====
+node_modules/
+dist/
