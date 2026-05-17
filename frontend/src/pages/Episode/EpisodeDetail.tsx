@@ -1,11 +1,9 @@
 // src/pages/Episode/EpisodeDetail.tsx
 
-import {
-  useParams,
-  useNavigate,
-} from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 
-import { mockEpisodes } from "../../mock/data";
+import { fetchEpisodes, type UiEpisode } from "../../api/doran";
 
 import BottomNav from "../../components/BottomNav";
 
@@ -15,44 +13,56 @@ import "../../styles/EpisodeDetail.css";
 
 export default function EpisodeDetail() {
   const { id } = useParams();
-
   const navigate = useNavigate();
 
-  const episodeId = Number(id);
+  const [episode, setEpisode] = useState<UiEpisode | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  /* localStorage */
+  useEffect(() => {
+    let cancelled = false;
 
-  const storedEpisodes = JSON.parse(
-    localStorage.getItem("episodes") ||
-      "[]"
-  );
+    async function load() {
+      try {
+        setIsLoading(true);
+        setError("");
+        const episodes = await fetchEpisodes();
+        const found = episodes.find((ep) => ep.id === id) ?? null;
+        if (!cancelled) setEpisode(found);
+      } catch (e) {
+        console.error("Episode detail load failed:", e);
+        if (!cancelled) {
+          setError(
+            e instanceof Error
+              ? e.message
+              : "에피소드를 불러오지 못했습니다."
+          );
+        }
+      } finally {
+        if (!cancelled) setIsLoading(false);
+      }
+    }
 
-  /* 전체 episode */
+    load();
 
-  const allEpisodes = [
-    ...storedEpisodes,
-    ...mockEpisodes,
-  ];
+    return () => {
+      cancelled = true;
+    };
+  }, [id]);
 
-  /* 현재 episode */
+  if (isLoading) {
+    return <div className="episode-detail-page">에피소드를 불러오는 중입니다.</div>;
+  }
 
-  const episode = allEpisodes.find(
-    (e) => e.id === episodeId
-  );
-
-  if (!episode) {
+  if (error || !episode) {
     return (
       <div className="episode-detail-page">
-        에피소드를 찾을 수 없습니다.
+        {error || "에피소드를 찾을 수 없습니다."}
       </div>
     );
   }
 
-  /* 날짜 */
-
-  const formattedDate = new Date(
-    episode.createdAt
-  ).toLocaleDateString("ko-KR", {
+  const formattedDate = new Date(episode.createdAt).toLocaleDateString("ko-KR", {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -61,71 +71,29 @@ export default function EpisodeDetail() {
   return (
     <>
       <main className="episode-detail-page">
-        {/* 뒤로가기 */}
-
-        <button
-          className="episode-detail-back-btn"
-          onClick={() => navigate(-1)}
-        >
-          <img
-            src={backIcon}
-            alt="back"
-            className="episode-detail-back-icon"
-          />
+        <button className="episode-detail-back-btn" onClick={() => navigate(-1)}>
+          <img src={backIcon} alt="back" className="episode-detail-back-icon" />
         </button>
 
-        {/* 카드 */}
-
         <section className="episode-detail-card">
-          {/* 날짜 */}
+          <p className="episode-detail-date">{formattedDate}</p>
 
-          <p className="episode-detail-date">
-            {formattedDate}
-          </p>
-
-          {/* 제목 */}
-
-          <h1 className="episode-detail-title">
-            {episode.title}
-          </h1>
-
-          {/* divider */}
+          <h1 className="episode-detail-title">{episode.title}</h1>
 
           <div className="episode-detail-divider"></div>
 
-          {/* 본문 */}
-
           <div className="episode-detail-content">
-            {episode.content ? (
-              (episode.content as string)
-                .split("\n")
-                .filter(
-                  (line: string) =>
-                    line.trim() !== ""
-                )
-                .map(
-                  (
-                    line: string,
-                    idx: number
-                  ) => (
-                    <p
-                      key={idx}
-                      className="episode-detail-paragraph"
-                    >
-                      {line}
-                    </p>
-                  )
-                )
-            ) : (
-              <p className="episode-detail-paragraph">
-                {episode.preview}
-              </p>
-            )}
+            {episode.content
+              .split("\n")
+              .filter((line) => line.trim() !== "")
+              .map((line, idx) => (
+                <p key={idx} className="episode-detail-paragraph">
+                  {line}
+                </p>
+              ))}
           </div>
         </section>
       </main>
-
-      {/* 하단 네비 */}
 
       <BottomNav />
     </>

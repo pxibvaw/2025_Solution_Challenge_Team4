@@ -47,10 +47,13 @@ export function clearSession() {
   localStorage.removeItem(LS_SESSION_KEY);
 }
 
-export function createNewSession(initialQuestion: string): InterviewSession {
+export function createNewSession(
+  initialQuestion: string,
+  sessionId?: string
+): InterviewSession {
   const now = Date.now();
   return {
-    sessionId: `s_${now}`,
+    sessionId: sessionId ?? `s_${now}`,
     startedAt: now,
     state: "IDLE",
     currentQuestion: initialQuestion,

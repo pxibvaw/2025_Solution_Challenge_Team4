@@ -7,6 +7,7 @@ import StepAge from "./steps/StepAge";
 import StepTopic from "./steps/StepTopic";
 
 import type { UserProfileContext } from "../../store/profileStore";
+import { saveOnboardingToBackend } from "../../api/doran";
 
 import {
   loadOnboardingDraft,
@@ -55,8 +56,16 @@ export default function Onboarding() {
     setStep((p) => p - 1);
   };
 
-  const complete = () => {
+  const [isSaving, setIsSaving] = useState(false);
+
+  const complete = async () => {
+    if (isSaving) return;
+
     try {
+      setIsSaving(true);
+
+      await saveOnboardingToBackend(profile);
+
       saveProfile(profile);
 
       setOnboardedTrue();
@@ -73,8 +82,12 @@ export default function Onboarding() {
       );
 
       alert(
-        "온보딩 데이터 저장에 실패했어요. 다시 시도해주세요."
+        e instanceof Error
+          ? e.message
+          : "온보딩 데이터 저장에 실패했어요. 다시 시도해주세요."
       );
+    } finally {
+      setIsSaving(false);
     }
   };
 
