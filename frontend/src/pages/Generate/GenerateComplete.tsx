@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 import {
+  createBook,
   fetchEpisodes,
   type AutobiographyResponse,
   type UiEpisode,
@@ -13,7 +14,6 @@ import bookBackground from "../../assets/book_background.png";
 
 import "../../styles/GenerateComplete.css";
 
-const generateId = () => Date.now();
 const generateTimestamp = () => new Date().toISOString();
 const getTodayDateString = () => new Date().toLocaleDateString("ko-KR");
 
@@ -104,9 +104,9 @@ export default function GenerateComplete() {
     return randomGradient;
   });
 
-  const [previewBookId] = useState(() => Date.now());
+  const [previewBookId] = useState(() => `preview-${Date.now()}`);
 
-  const buildBook = (id: number) => ({
+  const buildBook = (id: string) => ({
     id,
     title: autobiography?.life_theme || "나의 이야기",
     createdAt: generateTimestamp(),
@@ -128,15 +128,31 @@ export default function GenerateComplete() {
     });
   };
 
-  const handleSave = () => {
-    const existing = JSON.parse(localStorage.getItem("books") || "[]");
-    const newBook = buildBook(generateId());
+  const handleSave = async () => {
+    if (pages.length === 0) return;
 
-    localStorage.setItem("books", JSON.stringify([newBook, ...existing]));
+    try {
+      await createBook({
+        title: autobiography?.life_theme || "나의 이야기",
+        coverGradient: selectedGradient,
+        prologue: autobiography?.prologue,
+        epilogue: autobiography?.epilogue,
+        lifeTheme: autobiography?.life_theme,
+        generationError,
+        pages: pages.map((page) => ({
+          episodeId: page.id,
+          chapter: page.chapter,
+          content: page.content,
+          pageNumber: page.pageNumber,
+        })),
+      });
 
-    sessionStorage.removeItem(gradientStorageKey);
-
-    navigate("/library");
+      sessionStorage.removeItem(gradientStorageKey);
+      navigate("/library");
+    } catch (e) {
+      console.error("Book save failed:", e);
+      alert(e instanceof Error ? e.message : "책 저장에 실패했습니다.");
+    }
   };
 
   return (

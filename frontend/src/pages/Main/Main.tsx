@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { mockBooks } from "../../mock/data";
-import { fetchEpisodes, type UiEpisode } from "../../api/doran";
+import { fetchBooks, fetchEpisodes, type Book, type UiEpisode } from "../../api/doran";
 
 import "../../styles/main.css";
 
@@ -29,16 +28,21 @@ export default function Main() {
     "어제 있었던 일 중 가장 기억에 남는 순간은 무엇인가요?";
 
   const [recentEpisodes, setRecentEpisodes] = useState<UiEpisode[]>([]);
+  const [previewBooks, setPreviewBooks] = useState<Book[]>([]);
 
   useEffect(() => {
     let cancelled = false;
 
-    async function loadEpisodes() {
+    async function loadHomeData() {
       try {
-        const data = await fetchEpisodes();
+        const [episodes, books] = await Promise.all([
+          fetchEpisodes(),
+          fetchBooks(),
+        ]);
         if (cancelled) return;
+
         setRecentEpisodes(
-          data
+          episodes
             .sort(
               (a, b) =>
                 new Date(b.createdAt).getTime() -
@@ -46,27 +50,18 @@ export default function Main() {
             )
             .slice(0, 2)
         );
+        setPreviewBooks(books.slice(0, 3));
       } catch (e) {
-        console.error("Recent episode load failed:", e);
+        console.error("Home data load failed:", e);
       }
     }
 
-    loadEpisodes();
+    loadHomeData();
 
     return () => {
       cancelled = true;
     };
   }, []);
-
-  const storedBooks = JSON.parse(localStorage.getItem("books") || "[]");
-
-  const previewBooks = [...storedBooks, ...mockBooks]
-    .sort(
-      (a, b) =>
-        new Date(b.createdAt).getTime() -
-        new Date(a.createdAt).getTime()
-    )
-    .slice(0, 3);
 
   return (
     <main className="main-container">

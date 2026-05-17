@@ -1,13 +1,9 @@
-export interface StartInterviewResponse {
-    sessionId: string;
-    }
+import { startInterviewSession } from "./doran";
 
-    export const startInterview = async (): Promise<StartInterviewResponse> => {
-    return new Promise((resolve) => {
-        setTimeout(() => {
-        resolve({
-            sessionId: "mock-session-" + Date.now(),
-        });
-        }, 500);
-    });
+export interface StartInterviewResponse {
+  sessionId: string;
+}
+
+export const startInterview = async (): Promise<StartInterviewResponse> => {
+  return startInterviewSession();
 };

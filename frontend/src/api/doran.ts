@@ -38,6 +38,45 @@ export type AutobiographyResponse = {
   life_theme?: string;
 };
 
+export type BookPage = {
+  id: string;
+  bookId?: string;
+  episodeId?: string;
+  chapter: string;
+  content: string;
+  pageNumber: number;
+};
+
+export type Book = {
+  id: string;
+  userId?: string;
+  title: string;
+  coverGradient?: string;
+  prologue?: string;
+  epilogue?: string;
+  lifeTheme?: string;
+  generationError?: string;
+  createdAt: string;
+  updatedAt?: string;
+  pageCount?: number;
+  pages?: BookPage[];
+};
+
+export type BookCreatePayload = {
+  title: string;
+  coverGradient?: string;
+  prologue?: string;
+  epilogue?: string;
+  lifeTheme?: string;
+  generationError?: string;
+  pages: {
+    episodeId?: string;
+    chapter: string;
+    content: string;
+    pageNumber: number;
+  }[];
+};
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_BASE_URL}${path}`, {
     headers: {
@@ -171,4 +210,45 @@ export async function generateAutobiography(selectedEpisodeIds: string[]) {
       selectedEpisodeIds,
     }),
   });
+}
+
+export async function fetchBooks(month?: string) {
+  const query = new URLSearchParams({
+    userId: String(DEFAULT_USER_ID),
+  });
+
+  if (month) {
+    query.set("month", month);
+  }
+
+  return request<Book[]>(`/api/books?${query.toString()}`);
+}
+
+export async function fetchBook(bookId: string) {
+  return request<Book>(
+    `/api/books/${bookId}?userId=${encodeURIComponent(String(DEFAULT_USER_ID))}`
+  );
+}
+
+export async function fetchBookPages(bookId: string) {
+  return request<BookPage[]>(
+    `/api/books/${bookId}/pages?userId=${encodeURIComponent(String(DEFAULT_USER_ID))}`
+  );
+}
+
+export async function createBook(payload: BookCreatePayload) {
+  return request<Book>("/api/books", {
+    method: "POST",
+    body: JSON.stringify({
+      userId: String(DEFAULT_USER_ID),
+      ...payload,
+    }),
+  });
+}
+
+export async function deleteBook(bookId: string) {
+  return request<{ deleted: boolean; bookId: string }>(
+    `/api/books/${bookId}?userId=${encodeURIComponent(String(DEFAULT_USER_ID))}`,
+    { method: "DELETE" }
+  );
 }

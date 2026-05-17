@@ -191,15 +191,20 @@ frontend npm run build: 성공
 
 ### 6. 현재 동작 범위
 
-현재 프론트 화면은 열어서 확인할 수 있습니다. 다만 프론트의 일부 화면은 아직 백엔드 API와 완전히 연결되지 않았고, `frontend/src/mock/data.ts`의 mock 데이터를 사용합니다.
+로그인을 제외한 주요 사용자 흐름은 백엔드 API 기준으로 연결되어 있습니다. `frontend/src/mock/data.ts`는 FE 참고용 파일로 남아 있지만, 현재 앱 실행 흐름에서는 에피소드/책/서재 화면이 실제 API를 조회합니다.
 
-예를 들어 에피소드/책 화면에 미리 보이는 데이터는 실제 DB에서 생성된 데이터가 아니라 프론트 화면 확인용 더미 데이터입니다.
-
-백엔드 실제 에피소드 API는 다음 주소로 확인할 수 있습니다.
+주요 확인 API:
 
 ```text
-GET http://localhost:8080/api/episodes?userId=1
+GET    http://localhost:8080/api/episodes?userId=1
+POST   http://localhost:8080/api/books
+GET    http://localhost:8080/api/books?userId=1
+GET    http://localhost:8080/api/books/{bookId}?userId=1
+GET    http://localhost:8080/api/books/{bookId}/pages?userId=1
+DELETE http://localhost:8080/api/books/{bookId}?userId=1
 ```
+
+`/api/books`는 AI 자서전 생성 결과를 프론트가 저장한 뒤, 서재/책 상세/리더에서 다시 조회하는 용도입니다.
 
 ### 7. AI 서버 연동
 

@@ -32,51 +32,6 @@ export default function InterviewLogPanel({
 
   if (!open) return null;
 
-  /* =========================
-    로그 → episode 저장
-  ========================= */
-
-  const saveAsEpisode = () => {
-    const existing = JSON.parse(
-      localStorage.getItem(
-        "episodes"
-      ) || "[]"
-    );
-
-    const newEpisode = {
-      id: Date.now(),
-
-      title:
-        messages
-          .find(
-            (m) =>
-              m.speaker === "USER"
-          )
-          ?.text.slice(0, 12) ||
-        "새로운 이야기",
-
-      preview: messages
-        .map((m) => m.text)
-        .join(" ")
-        .slice(0, 50),
-
-      content: messages
-        .map((m) => m.text)
-        .join("\n\n"),
-
-      createdAt:
-        new Date().toISOString(),
-    };
-
-    localStorage.setItem(
-      "episodes",
-      JSON.stringify([
-        newEpisode,
-        ...existing,
-      ])
-    );
-  };
-
   return (
     <div className="log-page">
       {/* 헤더 */}
@@ -143,10 +98,7 @@ export default function InterviewLogPanel({
         <div className="log-footer">
           <button
             className="log-close-btn"
-            onClick={() => {
-              saveAsEpisode();
-              onClose();
-            }}
+            onClick={onClose}
           >
             닫기
           </button>
