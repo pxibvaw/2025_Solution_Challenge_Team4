@@ -1,5 +1,8 @@
 # ai/app/api.py
 import asyncio
+import logging
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI, BackgroundTasks, HTTPException, Depends, APIRouter
 from pydantic import BaseModel
 from ai.app.schemas import (
@@ -11,15 +14,35 @@ from ai.app.schemas import (
 from ai.app.orchestrator import handle_turn, end_session, mid_session_extraction
 from ai.app.settings import settings
 from ai.services.interview_service import get_history, should_mid_extract
-from ai.services.episode_service import run_episode_pipeline
+from ai.services.episode_service import run_episode_pipeline, startup_recovery
 from ai.services.autobiography_service import generate_autobiography
 from ai.services.memory_service import memory_service
 from ai.clients.tts_google import text_to_speech
 from ai.utils.cache import InMemoryCacheBackend
 
+logger = logging.getLogger(__name__)
+
+
+# ── Lifespan: 서버 startup/shutdown 훅 ────────────────────────
+# Outbox 파일(BE 다운 등으로 콜백 실패 후 영속화된 payload)을 재전송.
+# 이 훅이 없으면 서버 재시작해도 미전송 콜백이 영구 누락됨.
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        result = startup_recovery()
+        if result.get("pending", 0) > 0:
+            logger.info(f"[startup] callback outbox recovery: {result}")
+    except Exception as e:
+        # recovery 실패해도 서버는 떠야 함 (관측 가능성만 확보)
+        logger.warning(f"[startup] callback outbox recovery failed: {e}")
+    yield
+    # shutdown: 현재 정리할 리소스 없음. 추후 ChromaDB persist 등 필요 시 여기에.
+
+
 # ── FastAPI 앱 생성 ──────────────────────────────────────────
 # 프로덕션: /docs, /redoc 비활성화 (보안)
 app = FastAPI(
+    lifespan=lifespan,
     docs_url=None if settings.is_production else "/docs",
     redoc_url=None if settings.is_production else "/redoc",
 )
@@ -77,10 +100,13 @@ async def turn(req: TurnRequest, background_tasks: BackgroundTasks):
 
 @app.post("/end-session", response_model=EndSessionResponse)
 async def end_session_endpoint(req: EndSessionRequest, background_tasks: BackgroundTasks):
+    # BE가 profile을 함께 보냈으면 백그라운드 태스크에 직접 전달,
+    # 안 보냈으면 _run_end_session 내부에서 _session_profiles 캐시로 fallback.
     background_tasks.add_task(
         _run_end_session,
         req.sessionId,
         req.userId,
+        req.profile,
     )
 
     return EndSessionResponse(
@@ -102,9 +128,12 @@ async def autobiography(req: AutobiographyRequest):
         raise HTTPException(status_code=400, detail="에피소드가 없습니다.")
 
     try:
+        # BE가 req.profile을 같이 보내야 Planner/Chapter/Prologue 프롬프트가
+        # 사용자 톤(userTitle, speechLevel, ageGroup 등)에 맞춰 동작한다.
+        # 없으면 generic 값으로 동작 — 품질 저하.
         result = await asyncio.get_event_loop().run_in_executor(
             None,
-            lambda: generate_autobiography(req, profile=None)
+            lambda: generate_autobiography(req, profile=req.profile)
         )
         return result
     except ValueError as e:
@@ -178,31 +207,45 @@ def _run_mid_extraction(session_id: str):
     print(f"[mid-extraction] sessionId={session_id} saved={result['saved']} skipped={result['skipped']}")
 
 
-def _run_end_session(session_id: str, user_id: str):
+def _run_end_session(session_id: str, user_id: str, profile=None):
     """
     세션 종료 백그라운드 태스크.
 
     순서:
-      1. orchestrator.end_session → 메모리 처리 + session_log 반환
-      2. session_log 있을 때만 episode_pipeline 실행
-      3. profile 캐시 정리
+      1. profile 결정 — BE가 보낸 profile 우선, 없으면 _session_profiles 캐시로 fallback
+      2. orchestrator.end_session → 메모리 처리 + session_log 반환
+      3. session_log 있을 때만 episode_pipeline 실행
+      4. profile 캐시 정리 (예외 발생 시에도 try/finally로 보장)
     """
-    profile = _session_profiles.get(session_id)
+    # BE가 명시적으로 보낸 profile이 가장 신뢰도 높음.
+    # 캐시는 AI 서버 재시작 / 1시간 TTL 만료 시 None일 수 있어서
+    # BE의 직접 전달을 우선시한다.
+    if profile is None:
+        profile = _session_profiles.get(session_id)
 
-    memory_result, session_log = end_session(session_id, user_id, profile)
-    print(
-        f"[end-session] sessionId={session_id} "
-        f"saved={memory_result['saved']} skipped={memory_result['skipped']}"
-    )
-
-    if session_log:
-        run_episode_pipeline(
-            session_id=session_id,
-            user_id=user_id,
-            session_log=session_log,
-            profile=profile,
-            memory_service=memory_service,
+    try:
+        memory_result, session_log = end_session(session_id, user_id, profile)
+        print(
+            f"[end-session] sessionId={session_id} "
+            f"saved={memory_result['saved']} skipped={memory_result['skipped']}"
         )
 
-    # profile 캐시 정리
-    _session_profiles.delete(session_id)
+        if session_log:
+            run_episode_pipeline(
+                session_id=session_id,
+                user_id=user_id,
+                session_log=session_log,
+                profile=profile,
+                memory_service=memory_service,
+            )
+    except Exception as e:
+        # 백그라운드 태스크 예외는 FastAPI가 자동 로깅하지만,
+        # 어느 단계에서 깨졌는지 명시적으로 남겨야 디버깅 용이.
+        logger.error(
+            f"[end-session] 백그라운드 처리 실패 sessionId={session_id}: {e}",
+            exc_info=True,
+        )
+    finally:
+        # 어느 경로로 끝나든 profile 캐시는 정리 (메모리 누수 방지).
+        # 캐시에 없으면 delete가 no-op이라 안전.
+        _session_profiles.delete(session_id)

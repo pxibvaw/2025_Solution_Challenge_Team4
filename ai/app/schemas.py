@@ -35,6 +35,10 @@ class TurnResponse(BaseModel):
 class EndSessionRequest(BaseModel):
     sessionId: str
     userId: str
+    # BE가 인터뷰 종료 시점에 사용자 프로필을 함께 보낼 수 있다.
+    # 없으면 AI 측 _session_profiles 인메모리 캐시로 fallback.
+    # (AI 재시작 시 캐시 손실 대비를 위해 BE가 보내주는 게 권장됨.)
+    profile: Optional[UserProfileContext] = None
 
 
 class EndSessionResponse(BaseModel):
@@ -199,6 +203,9 @@ class AutobiographyRequest(BaseModel):
     userId: str
     selectedEpisodeIds: list[str]
     episodes: list[Episode]
+    # BE가 자서전 생성 시점에 사용자 프로필을 함께 보낼 수 있다.
+    # 없으면 Planner/Chapter/Prologue 프롬프트가 generic 값으로 동작 (품질 저하).
+    profile: Optional[UserProfileContext] = None
 
 
 class AutobiographyChapter(BaseModel):

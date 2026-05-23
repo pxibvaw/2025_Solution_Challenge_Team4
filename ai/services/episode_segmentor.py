@@ -104,13 +104,15 @@ def _pass2_merge_and_enrich(
     conversation_text = format_conversation(session_log)
     existing_text = format_existing_episodes(existing_episodes)
 
+    # profile=None 방어: BE가 profile 안 보내고 _session_profiles 캐시도 비었을 때
+    # (AI 서버 재시작 / 1시간 TTL 만료 등) AttributeError 방지를 위해 fallback 값 사용.
     prompt = PASS2_ENRICH_PROMPT.format(
         conversation=conversation_text,
         boundaries=str(boundaries) if boundaries else "[]",
         existing_episodes=existing_text,
-        user_title=profile.userTitle,
-        memorable_age=profile.memorableAge or "미입력",
-        birth_year=profile.birthYear or "미입력",
+        user_title=profile.userTitle if profile else "사용자",
+        memorable_age=(profile.memorableAge if profile else None) or "미입력",
+        birth_year=(profile.birthYear if profile else None) or "미입력",
     )
     raw = generate_reply(prompt)
     result = parse_llm_json(raw, "pass2")
@@ -162,14 +164,15 @@ def _extract_metadata(
     end = segment["turn_end"]
     segment_conv = format_conversation(session_log, start, end)
 
+    # profile=None 방어 (_pass2_merge_and_enrich과 동일 정책)
     prompt = METADATA_PROMPT.format(
         segment_conversation=segment_conv,
         narrative_direction=segment.get("narrative_direction") or "없음",
         dominant_emotion=segment.get("dominant_emotion") or "없음",
         life_value_hint=segment.get("life_value_hint") or "없음",
-        user_title=profile.userTitle,
-        memorable_age=profile.memorableAge or "미입력",
-        birth_year=profile.birthYear or "미입력",
+        user_title=profile.userTitle if profile else "사용자",
+        memorable_age=(profile.memorableAge if profile else None) or "미입력",
+        birth_year=(profile.birthYear if profile else None) or "미입력",
     )
     raw = generate_reply(prompt)
     meta = parse_llm_json(raw, f"metadata[{start}~{end}]")

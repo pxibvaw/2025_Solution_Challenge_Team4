@@ -74,13 +74,25 @@ class MemoryService:
     # ── 조회 ─────────────────────────────────────────────────
 
     def retrieve(self, query_text: str, k: int = 5) -> list[str]:
-        """기존 retrieve_memory와 동일한 기능."""
-        memory_count = count_memories()
-        return retrieve(
-            query_text=query_text,
-            memory_count=memory_count,
-            top_k=k,
-        )
+        """
+        기존 retrieve_memory와 동일한 기능.
+
+        embed_text/ChromaDB 호출 실패 시 빈 리스트 반환 → /turn은 계속 동작.
+        (Gemini embed API 일시 장애 / 할당량 초과 / 네트워크 블립 대비)
+        """
+        try:
+            memory_count = count_memories()
+            return retrieve(
+                query_text=query_text,
+                memory_count=memory_count,
+                top_k=k,
+            )
+        except Exception as e:
+            logger.warning(
+                f"[memory_service] retrieve 실패 — 빈 메모리로 계속 진행: {e}",
+                exc_info=True,
+            )
+            return []
 
     # ── 에피소드 파이프라인용 ──────────────────────────────────
 

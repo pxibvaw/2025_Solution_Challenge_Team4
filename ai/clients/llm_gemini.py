@@ -16,6 +16,7 @@ Gemini LLM 클라이언트 (Bulkhead 패턴 적용).
 import logging
 import os
 import threading
+import time
 
 from google import genai
 from ai.app.settings import settings
@@ -38,6 +39,44 @@ _pools = {
 }
 
 
+# ──────────────────────────────────────────────────────────────
+# 응답 가드 (safety filter / 할당량 초과 / 일시적 네트워크)
+# ──────────────────────────────────────────────────────────────
+#
+# Gemini는 safety filter 발동 시 response.text를 None으로 반환할 수 있고,
+# 일시적 네트워크 오류로 빈 문자열이 올 수도 있다.
+# 하위 파서(parse_llm_response, parse_llm_json)는 None/빈 문자열을 받으면
+# AttributeError 또는 JSONDecodeError로 raw 500을 일으킨다.
+#
+# 정책:
+#   1. None / 빈 문자열이면 1회 재시도 (0.8s backoff)
+#   2. 그래도 실패하면 안내 메시지를 반환 (인터뷰 자체가 끊기지 않게)
+#   3. 모든 실패는 warning 로그로 남겨 환각 튜닝 시 추적 가능
+
+_EMPTY_RESPONSE_FALLBACK = (
+    "죄송해요, 잠시 답을 떠올리지 못했어요. 같은 이야기를 다시 들려주실 수 있을까요?"
+)
+
+
+def _is_empty_response(text) -> bool:
+    """Gemini 응답이 None이거나 공백만 있는지 판정."""
+    return text is None or (isinstance(text, str) and not text.strip())
+
+
+def _call_gemini(prompt: str):
+    """단일 Gemini 호출. 예외는 None 반환으로 흡수."""
+    try:
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+        )
+        return response.text
+    except Exception as e:
+        # exc_info=True: 스택트레이스까지 남겨 환각 튜닝 중 원인 추적 쉽게.
+        logger.warning(f"[generate_reply] Gemini 호출 예외: {e}", exc_info=True)
+        return None
+
+
 def generate_reply(prompt: str, pool: str = "background") -> str:
     """
     Gemini 2.5 Flash에 프롬프트를 보내고 응답 텍스트를 반환.
@@ -48,16 +87,30 @@ def generate_reply(prompt: str, pool: str = "background") -> str:
                 기본값 "background" → 기존 호출 코드 변경 불필요.
 
     Returns:
-        LLM 응답 텍스트
+        LLM 응답 텍스트. Gemini가 None/빈 문자열을 반환하면
+        1회 재시도 후에도 실패 시 안내 메시지 fallback.
     """
     semaphore = _pools.get(pool, _pools["background"])
 
     semaphore.acquire()
     try:
-        response = client.models.generate_content(
-            model="gemini-2.5-flash",
-            contents=prompt,
-        )
-        return response.text
+        # 1차 호출
+        text = _call_gemini(prompt)
+
+        # 빈 응답이면 1회 재시도
+        if _is_empty_response(text):
+            time.sleep(0.8)
+            text = _call_gemini(prompt)
+
+        # 그래도 빈 응답이면 안내 메시지 fallback
+        if _is_empty_response(text):
+            logger.warning(
+                "[generate_reply] Gemini가 빈/None 응답 "
+                "(safety filter 또는 할당량 의심) — "
+                f"pool={pool}, prompt_len={len(prompt)}"
+            )
+            return _EMPTY_RESPONSE_FALLBACK
+
+        return text
     finally:
         semaphore.release()
