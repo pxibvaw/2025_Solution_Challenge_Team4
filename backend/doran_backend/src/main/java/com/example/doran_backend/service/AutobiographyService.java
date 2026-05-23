@@ -4,6 +4,7 @@ import com.example.doran_backend.ai.AiAutobiographyClient;
 import com.example.doran_backend.dto.AiEpisodeResponse;
 import com.example.doran_backend.dto.AutobiographyGenerateRequest;
 import com.example.doran_backend.dto.AutobiographyResponse;
+import com.example.doran_backend.dto.UserProfileContext;
 import com.example.doran_backend.entity.Episode;
 import com.example.doran_backend.repository.EpisodeRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class AutobiographyService {
     private final EpisodeRepository episodeRepository;
     private final AiEpisodeService aiEpisodeService;
     private final AiAutobiographyClient aiAutobiographyClient;
+    private final OnboardingService onboardingService;
 
     @Transactional(readOnly = true)
     public AutobiographyResponse generate(AutobiographyGenerateRequest request) {
@@ -40,7 +42,17 @@ public class AutobiographyService {
                 .map(aiEpisodeService::toResponse)
                 .toList();
 
-        return aiAutobiographyClient.generate(userId, selectedEpisodeIds, aiEpisodes);
+        UserProfileContext profileContext = onboardingService.getUserProfileContext(parseUserId(userId));
+
+        return aiAutobiographyClient.generate(userId, selectedEpisodeIds, aiEpisodes, profileContext);
+    }
+
+    private Long parseUserId(String userId) {
+        try {
+            return Long.parseLong(userId);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("userId는 숫자 형식이어야 합니다.");
+        }
     }
 
     private String requireText(String value, String message) {

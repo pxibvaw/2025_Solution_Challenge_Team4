@@ -238,7 +238,8 @@ public class InterviewService {
 
     private void notifyAiEndSession(InterviewSession session) {
         try {
-            aiSessionClient.endSession(session.getSessionId(), String.valueOf(session.getUserId()));
+            UserProfileContext profileContext = onboardingService.getUserProfileContext(session.getUserId());
+            aiSessionClient.endSession(session.getSessionId(), String.valueOf(session.getUserId()), profileContext);
         } catch (RuntimeException ignored) {
             // Session end must remain stable even if the optional AI service is unavailable.
         }

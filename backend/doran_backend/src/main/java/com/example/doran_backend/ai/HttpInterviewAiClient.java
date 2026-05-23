@@ -52,6 +52,9 @@ public class HttpInterviewAiClient implements InterviewAiClient {
     }
 
     private AiProfile toAiProfile(UserProfileContext profileContext) {
+        if (profileContext == null) {
+            return null;
+        }
         return new AiProfile(
                 profileContext.getUserTitle(),
                 profileContext.getSpeechLevel(),
