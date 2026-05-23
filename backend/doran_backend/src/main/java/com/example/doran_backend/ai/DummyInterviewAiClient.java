@@ -11,6 +11,7 @@ public class DummyInterviewAiClient implements InterviewAiClient {
                 "말씀해주셔서 감사합니다.",
                 "그때 어떤 기분이셨나요?",
                 null,
+                null,
                 "interview_v1",
                 "dummy",
                 0L

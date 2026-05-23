@@ -25,5 +25,6 @@ public class InterviewTurnResponse {
         private String model;         // 예: "dummy"
         private String promptVersion; // 예: "interview_v1"
         private Long latencyMs;       // 예: 10L
+        private String audioContent;  // optional TTS payload/url/base64 from AI
     }
 }

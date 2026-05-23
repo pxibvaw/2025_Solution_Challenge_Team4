@@ -162,7 +162,7 @@ export async function sendInterviewTurn(params: {
     sessionId: string;
     turnId: string;
     output: { reply: string; question: string };
-    meta: { model: string; promptVersion: string; latencyMs: number };
+    meta: { model: string; promptVersion: string; latencyMs: number; audioContent?: string | null };
   }>("/interview/turn", {
     method: "POST",
     body: JSON.stringify({

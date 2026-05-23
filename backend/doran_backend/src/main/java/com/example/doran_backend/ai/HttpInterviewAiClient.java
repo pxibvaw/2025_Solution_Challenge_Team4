@@ -45,6 +45,7 @@ public class HttpInterviewAiClient implements InterviewAiClient {
                 response.reply(),
                 response.question(),
                 null,
+                response.audioContent(),
                 "interview_v1",
                 "ai-service",
                 0L

@@ -127,7 +127,7 @@ public class InterviewService {
                     new InterviewTurnResponse.Output(existing.getReply(), existing.getQuestion());
 
             InterviewTurnResponse.Meta meta =
-                    new InterviewTurnResponse.Meta(existing.getModel(), existing.getPromptVersion(), existing.getLatencyMs());
+                    new InterviewTurnResponse.Meta(existing.getModel(), existing.getPromptVersion(), existing.getLatencyMs(), null);
 
             return new InterviewTurnResponse(existing.getSessionId(), existing.getTurnId(), output, meta);
         }
@@ -166,7 +166,8 @@ public class InterviewService {
         InterviewTurnResponse.Meta meta = new InterviewTurnResponse.Meta(
                 log.getModel(),
                 log.getPromptVersion(),
-                log.getLatencyMs()
+                log.getLatencyMs(),
+                aiResult.getAudioContent()
         );
 
         return new InterviewTurnResponse(request.getSessionId(), turnId, output, meta);
