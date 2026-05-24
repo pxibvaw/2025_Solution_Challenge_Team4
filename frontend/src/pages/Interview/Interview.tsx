@@ -1,5 +1,3 @@
-// src/pages/Interview/Interview.tsx
-
 import { useEffect, useMemo, useState } from "react";
 import "../../styles/interviewRoom.css";
 import { useNavigate } from "react-router-dom";
@@ -27,8 +25,11 @@ const FIRST_QUESTION_FALLBACK = "오늘은 어떤 이야기를 나눠볼까요?"
 
 function buildFirstQuestion(profileTitle?: string, happiestMoment?: string) {
   if (happiestMoment) {
-    return `${profileTitle ? `${profileTitle}님, ` : ""}${happiestMoment} 이야기를 조금 더 들려주실 수 있을까요?`;
+    return `${
+      profileTitle ? `${profileTitle}님, ` : ""
+    }${happiestMoment} 이야기를 조금 더 들려주실 수 있을까요?`;
   }
+
   return `${profileTitle ? `${profileTitle}님, ` : ""}${FIRST_QUESTION_FALLBACK}`;
 }
 
@@ -45,11 +46,20 @@ export default function Interview() {
   const navigate = useNavigate();
   const profile = useMemo(() => loadProfile(), []);
 
+  // F3. 온보딩 없이 /interview 직접 진입한 경우 방어
+  useEffect(() => {
+    if (!profile) {
+      navigate("/onboarding", { replace: true });
+    }
+  }, [navigate, profile]);
+
   const [session, setSession] = useState<InterviewSession | null>(() => {
     const existing = loadSession();
+
     if (existing && existing.state !== "ENDED" && isUuid(existing.sessionId)) {
       return existing;
     }
+
     return null;
   });
 
@@ -62,6 +72,8 @@ export default function Interview() {
   }, [session]);
 
   useEffect(() => {
+    // profile이 없으면 온보딩으로 이동하므로 인터뷰 시작 API 호출 방지
+    if (!profile) return;
     if (session) return;
 
     let cancelled = false;
@@ -69,23 +81,34 @@ export default function Interview() {
     async function start() {
       try {
         setIsStarting(true);
+
         const response = await startInterviewSession();
+
         if (cancelled) return;
 
-        const q = buildFirstQuestion(profile?.userTitle, profile?.happiestMoment);
+        const q = buildFirstQuestion(
+          profile?.userTitle,
+          profile?.happiestMoment
+        );
+
         const created = createNewSession(q, response.sessionId);
+
         saveSession(created);
         setSession(created);
       } catch (e) {
         console.error("Interview start failed:", e);
+
         alert(
           e instanceof Error
             ? e.message
             : "인터뷰를 시작하지 못했어요. 백엔드 서버를 확인해주세요."
         );
+
         navigate("/main", { replace: true });
       } finally {
-        if (!cancelled) setIsStarting(false);
+        if (!cancelled) {
+          setIsStarting(false);
+        }
       }
     }
 
@@ -94,7 +117,7 @@ export default function Interview() {
     return () => {
       cancelled = true;
     };
-  }, [navigate, profile?.happiestMoment, profile?.userTitle, session]);
+  }, [navigate, profile, session]);
 
   const setState = (state: InterviewSession["state"]) => {
     setSession((prev) => (prev ? { ...prev, state } : prev));
@@ -134,7 +157,10 @@ export default function Interview() {
   };
 
   const handleStartAnswer = () => {
-    if (!session || session.state === "ENDED" || session.state === "PAUSED") return;
+    if (!session || session.state === "ENDED" || session.state === "PAUSED") {
+      return;
+    }
+
     setState("LISTENING");
   };
 
@@ -142,7 +168,9 @@ export default function Interview() {
     if (!session || session.state !== "LISTENING") return;
 
     const userText =
-      window.prompt("백엔드로 보낼 답변을 입력해주세요.", "그때가 참 따뜻했어요.")?.trim() ?? "";
+      window
+        .prompt("백엔드로 보낼 답변을 입력해주세요.", "그때가 참 따뜻했어요.")
+        ?.trim() ?? "";
 
     if (!userText) {
       setState("IDLE");
@@ -174,37 +202,46 @@ export default function Interview() {
       setState("IDLE");
     } catch (e) {
       console.error("Interview turn failed:", e);
+
       setSession((prev) =>
         prev
           ? {
               ...prev,
               state: "ERROR",
               lastError:
-                e instanceof Error
-                  ? e.message
-                  : "답변 처리에 실패했습니다.",
+                e instanceof Error ? e.message : "답변 처리에 실패했습니다.",
             }
           : prev
       );
+
       alert(
         e instanceof Error
           ? e.message
           : "답변 처리에 실패했습니다. 다시 시도해주세요."
       );
+
       setState("IDLE");
     }
   };
 
   const handleMicToggle = () => {
     if (!session) return;
-    if (session.state === "LISTENING") handleStopAnswer();
-    else handleStartAnswer();
+
+    if (session.state === "LISTENING") {
+      handleStopAnswer();
+    } else {
+      handleStartAnswer();
+    }
   };
 
   const handlePauseToggle = () => {
     if (!session) return;
-    if (session.state === "PAUSED") setState("IDLE");
-    else if (session.state !== "ENDED") setState("PAUSED");
+
+    if (session.state === "PAUSED") {
+      setState("IDLE");
+    } else if (session.state !== "ENDED") {
+      setState("PAUSED");
+    }
   };
 
   const handleEnd = async () => {
@@ -214,10 +251,9 @@ export default function Interview() {
       await endInterviewSession(session.sessionId);
     } catch (e) {
       console.error("Interview end failed:", e);
+
       alert(
-        e instanceof Error
-          ? e.message
-          : "인터뷰 종료 요청에 실패했습니다."
+        e instanceof Error ? e.message : "인터뷰 종료 요청에 실패했습니다."
       );
     }
 
