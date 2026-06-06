@@ -21,6 +21,7 @@ public class HttpInterviewAiClient implements InterviewAiClient {
         this.restClient = RestClient.builder()
                 .baseUrl(properties.getBaseUrl())
                 .requestFactory(factory)
+                .defaultHeader("ngrok-skip-browser-warning", "true")
                 .build();
     }
 

@@ -23,6 +23,7 @@ public class HttpAiAutobiographyClient implements AiAutobiographyClient {
         this.restClient = RestClient.builder()
                 .baseUrl(properties.getBaseUrl())
                 .requestFactory(factory)
+                .defaultHeader("ngrok-skip-browser-warning", "true")
                 .build();
     }
 

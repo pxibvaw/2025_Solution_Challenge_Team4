@@ -19,6 +19,7 @@ public class HttpAiSessionClient implements AiSessionClient {
         this.restClient = RestClient.builder()
                 .baseUrl(properties.getBaseUrl())
                 .requestFactory(factory)
+                .defaultHeader("ngrok-skip-browser-warning", "true")
                 .build();
     }
 

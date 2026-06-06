@@ -1,9 +1,12 @@
 # ai/app/api.py
 import asyncio
 import logging
+import os
+import tempfile
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, BackgroundTasks, HTTPException, Depends, APIRouter
+from fastapi import FastAPI, BackgroundTasks, HTTPException, Depends, APIRouter, UploadFile, File
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from ai.app.schemas import (
     TurnRequest, TurnResponse,
@@ -16,6 +19,7 @@ from ai.app.settings import settings
 from ai.services.interview_service import get_history, should_mid_extract
 from ai.services.episode_service import run_episode_pipeline, startup_recovery
 from ai.services.autobiography_service import generate_autobiography
+from ai.services.audio_pipeline import process_audio
 from ai.services.memory_service import memory_service
 from ai.clients.tts_google import text_to_speech
 from ai.utils.cache import InMemoryCacheBackend
@@ -47,6 +51,25 @@ app = FastAPI(
     redoc_url=None if settings.is_production else "/redoc",
 )
 
+# ── CORS ─────────────────────────────────────────────────────
+# FE가 마이크 녹음 Blob을 AI /stt 로 직접 업로드하므로 origin 허용 필요.
+# 기본값은 Vite(5173) / CRA(3000). 운영에서 도메인 추가 시 환경변수로 주입.
+_cors_origins = [
+    o.strip()
+    for o in os.getenv(
+        "CORS_ALLOWED_ORIGINS",
+        "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000",
+    ).split(",")
+    if o.strip()
+]
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=_cors_origins,
+    allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # ── 캐시 ─────────────────────────────────────────────────────
 # InMemoryCacheBackend: thread-safe TTLCache (cachetools 래핑)
 # Redis 전환 시 → RedisCacheBackend로 import만 교체
@@ -57,6 +80,47 @@ _session_profiles = InMemoryCacheBackend(maxsize=500, ttl=3600)    # profile: 1�
 @app.get("/health")
 async def health():
     return {"status": "ok"}
+
+
+@app.post("/stt")
+async def stt(audio: UploadFile = File(...)):
+    """
+    음성 파일 → 텍스트 변환.
+
+    FE가 MediaRecorder로 녹음한 Blob(webm/ogg/wav 등)을 multipart로 업로드.
+    내부에서 ffmpeg(audio_pipeline.process_audio)로 16kHz mono wav 변환 후
+    GCS Speech-to-Text 호출.
+
+    Returns:
+        {"text": "변환된 텍스트"} — 인식 실패 시 text="" 반환 (인터뷰 흐름 중단 방지)
+    """
+    # UploadFile은 SpooledTemporaryFile. process_audio가 path를 받으므로
+    # 임시 파일로 한 번 저장. 확장자는 ffmpeg가 헤더로 판단하므로 무관.
+    suffix = os.path.splitext(audio.filename or "")[1] or ".webm"
+
+    tmp_path = None
+    try:
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            tmp.write(await audio.read())
+            tmp_path = tmp.name
+
+        # 동기 ffmpeg + GCS 호출을 이벤트 루프 블로킹 없이 처리
+        text = await asyncio.get_event_loop().run_in_executor(
+            None,
+            lambda: process_audio(tmp_path),
+        )
+
+        return {"text": text or ""}
+    except Exception as e:
+        logger.warning(f"[stt] 변환 실패: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"STT 변환 실패: {e}")
+    finally:
+        # 임시 파일은 항상 정리 (디스크 누수 방지)
+        if tmp_path and os.path.exists(tmp_path):
+            try:
+                os.unlink(tmp_path)
+            except OSError:
+                pass
 
 
 @app.post("/turn", response_model=TurnResponse)
