@@ -24,7 +24,7 @@ from ai.memory.chroma_store import (
     count_memories,
     get_all_memory_ids,
     delete_memories,
-    collection,
+    get_collection,
 )
 from ai.services.memory_retriever import retrieve
 
@@ -117,7 +117,7 @@ class MemoryService:
             logger.warning("[memory_service] get_facts_by_session: session_id가 비어있음")
             return []
         try:
-            result = collection.get(
+            result = get_collection().get(
                 where={"session_id": session_id},
                 include=["documents"],
             )
@@ -137,7 +137,7 @@ class MemoryService:
             logger.warning("[memory_service] delete_by_session: session_id가 비어있음")
             return 0
         try:
-            result = collection.get(
+            result = get_collection().get(
                 where={"session_id": session_id},
                 include=[],
             )
