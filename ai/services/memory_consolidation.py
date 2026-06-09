@@ -3,7 +3,7 @@ import json
 import re
 from ai.clients.llm_gemini import generate_reply
 from ai.embedding.embedder import embed_text
-from ai.memory.chroma_store import collection  # ChromaDB collection 직접 접근
+from ai.memory.chroma_store import get_collection
 
 CONSOLIDATION_THRESHOLD = 0.75  # dedup(0.85)보다 낮게 — 더 넓은 범위 압축
 CONSOLIDATION_PROMPT = """
@@ -26,7 +26,7 @@ def _get_all_memories() -> list[dict]:
     ChromaDB에서 전체 memory 조회
     반환: [{"id": ..., "text": ..., "metadata": ...}, ...]
     """
-    result = collection.get(include=["documents", "metadatas"])
+    result = get_collection().get(include=["documents", "metadatas"])
     if not result["ids"]:
         return []
     return [
@@ -88,7 +88,7 @@ def _delete_memories(ids: list[str]):
     """
     ChromaDB에서 memory 삭제
     """
-    collection.delete(ids=ids)
+    get_collection().delete(ids=ids)
 
 
 def run_consolidation():
