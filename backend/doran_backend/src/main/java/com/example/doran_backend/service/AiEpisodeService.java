@@ -171,17 +171,7 @@ public class AiEpisodeService {
                 episode.getAutobiographyHint(),
                 episode.getLifeValue(),
                 episode.getImportanceScore(),
-                new AiEpisodeQualityResponse(
-                        episode.getFaithfulnessScore(),
-                        episode.getCoverageScore(),
-                        episode.getEmotionalAuthenticity(),
-                        episode.getSensoryVividness(),
-                        episode.getPersonalVoice(),
-                        episode.getNarrativeFlow(),
-                        episode.getNarrativeRichness(),
-                        episode.getQualityGrade(),
-                        episode.getNeedsRegeneration()
-                ),
+                toQualityResponse(episode),
                 episode.getSourceSessionId(),
                 sourceTurnRange.isEmpty() ? null : sourceTurnRange,
                 fromJson(episode.getSourceFactsJson(), STRING_LIST_TYPE, List.of()),
@@ -193,6 +183,29 @@ public class AiEpisodeService {
                 episode.getUserMemo(),
                 episode.getCreatedAt(),
                 episode.getUpdatedAt()
+        );
+    }
+
+    private AiEpisodeQualityResponse toQualityResponse(Episode episode) {
+        if (episode.getFaithfulnessScore() == null
+                || episode.getCoverageScore() == null
+                || episode.getEmotionalAuthenticity() == null
+                || episode.getSensoryVividness() == null
+                || episode.getPersonalVoice() == null
+                || episode.getNarrativeFlow() == null) {
+            return null;
+        }
+
+        return new AiEpisodeQualityResponse(
+                episode.getFaithfulnessScore(),
+                episode.getCoverageScore(),
+                episode.getEmotionalAuthenticity(),
+                episode.getSensoryVividness(),
+                episode.getPersonalVoice(),
+                episode.getNarrativeFlow(),
+                episode.getNarrativeRichness(),
+                episode.getQualityGrade(),
+                episode.getNeedsRegeneration()
         );
     }
 
