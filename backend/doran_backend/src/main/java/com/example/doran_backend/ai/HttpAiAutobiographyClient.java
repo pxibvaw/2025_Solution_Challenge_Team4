@@ -3,15 +3,18 @@ package com.example.doran_backend.ai;
 import com.example.doran_backend.dto.AiEpisodeResponse;
 import com.example.doran_backend.dto.AutobiographyResponse;
 import com.example.doran_backend.dto.UserProfileContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.util.List;
 
 @Component
 @ConditionalOnProperty(name = "ai.service.enabled", havingValue = "true")
+@Slf4j
 public class HttpAiAutobiographyClient implements AiAutobiographyClient {
 
     private final RestClient restClient;
@@ -29,11 +32,20 @@ public class HttpAiAutobiographyClient implements AiAutobiographyClient {
 
     @Override
     public AutobiographyResponse generate(String userId, List<String> selectedEpisodeIds, List<AiEpisodeResponse> episodes, UserProfileContext profileContext) {
-        return restClient.post()
-                .uri("/autobiography")
-                .body(new AiAutobiographyRequest(userId, selectedEpisodeIds, episodes, AiProfile.from(profileContext)))
-                .retrieve()
-                .body(AutobiographyResponse.class);
+        try {
+            return restClient.post()
+                    .uri("/autobiography")
+                    .body(new AiAutobiographyRequest(userId, selectedEpisodeIds, episodes, AiProfile.from(profileContext)))
+                    .retrieve()
+                    .body(AutobiographyResponse.class);
+        } catch (RestClientResponseException e) {
+            log.error(
+                    "AI 자서전 요청 실패: status={}, response={}",
+                    e.getStatusCode(),
+                    e.getResponseBodyAsString()
+            );
+            throw e;
+        }
     }
 
     private record AiAutobiographyRequest(

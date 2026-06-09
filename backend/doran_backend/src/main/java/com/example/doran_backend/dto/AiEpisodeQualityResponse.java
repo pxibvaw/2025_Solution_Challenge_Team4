@@ -1,11 +1,13 @@
 package com.example.doran_backend.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AiEpisodeQualityResponse {
 
     @JsonProperty("faithfulness_score")
