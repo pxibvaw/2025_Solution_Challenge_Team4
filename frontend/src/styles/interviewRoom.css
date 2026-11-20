@@ -1,0 +1,745 @@
+/* =========================
+전체 페이지
+========================= */
+
+.interview-single {
+
+  width: 420px;
+
+  height: 100vh;
+
+  margin: 0 auto;
+
+  background: linear-gradient(
+
+    180deg,
+
+    #fff5e0 0%,
+
+    #ffe7d1 100%
+
+  );
+
+  position: relative;
+
+  overflow: hidden;
+
+  font-family: "SF Pro Rounded",
+
+    sans-serif;
+
+}
+
+/* =========================
+내부 영역
+========================= */
+
+.stage-container {
+  width: 100%;
+
+  min-height: 100vh;
+
+  position: relative;
+
+  padding: 72px 28px 160px;
+
+  box-sizing: border-box;
+}
+
+/* =========================
+상단 상태
+========================= */
+
+.stage-status {
+  color: #4a3a2d;
+
+  font-size: 18px;
+
+  font-weight: 700;
+
+  line-height: 140%;
+}
+
+/* =========================
+질문
+========================= */
+
+.stage-question-wrapper {
+  margin-top: 92px;
+
+  text-align: center;
+
+  padding: 0 12px;
+
+  position: relative;
+
+  z-index: 5;
+}
+
+.stage-question {
+  color: #4a3a2d;
+
+  text-align: center;
+
+  font-size: 24px;
+
+  font-weight: 700;
+
+  line-height: 155%;
+
+  word-break: keep-all;
+}
+
+/* =========================
+thinking
+========================= */
+
+.thinking-dots {
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin-top: 10px;
+}
+
+.thinking-dots span {
+  width: 10px;
+
+  height: 10px;
+
+  border-radius: 50%;
+
+  background: #4a3a2d;
+
+  animation: thinkingBounce 1.2s infinite;
+}
+
+.thinking-dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.thinking-dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@keyframes thinkingBounce {
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.5;
+  }
+
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* =========================
+캐릭터 영역
+========================= */
+
+.character-glow {
+  position: absolute;
+
+  top: 52%;
+
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  width: 434px;
+
+  height: 434px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  pointer-events: none;
+}
+
+/* =========================
+기본 상태
+AI 차례 / 대기 상태
+========================= */
+
+.character-glow::before {
+  content: "";
+
+  position: absolute;
+
+  width: 434px;
+
+  height: 434px;
+
+  border-radius: 434px;
+
+  background: radial-gradient(
+    52.61% 52.61% at 50.2% 47.39%,
+    rgba(255, 141, 80, 0.18)
+      4.81%,
+    rgba(255, 203, 175, 0.14)
+      26.44%,
+    rgba(239, 239, 239, 0.1)
+      75.96%,
+    rgba(255, 255, 255, 0.04)
+      100%
+  );
+
+  opacity: 0.55;
+
+  transition: all 0.3s ease;
+}
+
+.character-glow::after {
+  content: "";
+
+  position: absolute;
+
+  width: 290px;
+
+  height: 290px;
+
+  border-radius: 290px;
+
+  background: radial-gradient(
+    52.61% 52.61% at 50.2% 47.39%,
+    #f9e2b0 0%,
+    rgba(255, 252, 252, 0.45)
+      85.1%
+  );
+
+  opacity: 0.45;
+
+  transition: all 0.3s ease;
+}
+
+/* =========================
+내가 말하는 중일 때만 우웅우웅
+========================= */
+
+.character-glow.active::before {
+  opacity: 1;
+
+  animation: waveOuter 2.8s
+    infinite ease-in-out;
+}
+
+.character-glow.active::after {
+  opacity: 0.8;
+
+  animation: waveInner 2s
+    infinite ease-in-out;
+}
+
+/* =========================
+추가 링
+========================= */
+
+.character-ring {
+  position: absolute;
+
+  width: 210px;
+
+  height: 210px;
+
+  border-radius: 50%;
+
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.85)
+      0%,
+    rgba(255, 255, 255, 0.45)
+      45%,
+    rgba(255, 255, 255, 0)
+      100%
+  );
+
+  opacity: 0;
+}
+
+/* listening 상태에서만 추가 링 활성화 */
+
+.character-glow.active
+  .character-ring {
+  opacity: 1;
+
+  animation: ringPulse 1.8s
+    infinite ease-in-out;
+}
+
+/* =========================
+중심 원
+========================= */
+
+.character-circle {
+  width: 150px;
+
+  height: 150px;
+
+  border-radius: 50%;
+
+  position: relative;
+
+  z-index: 2;
+
+  background: radial-gradient(
+    circle at 50% 40%,
+    #ffe9b7 0%,
+    #ffc76c 48%,
+    #f3a258 100%
+  );
+
+  box-shadow:
+    0 0 40px
+      rgba(255, 196, 112, 0.55),
+    0 0 90px
+      rgba(255, 180, 90, 0.25);
+
+  transition: all 0.3s ease;
+}
+
+/* listening일 때만 중심 원 둥실 */
+
+.character-glow.active
+  .character-circle {
+  box-shadow:
+    0 0 50px
+      rgba(255, 196, 112, 0.8),
+    0 0 120px
+      rgba(255, 180, 90, 0.45);
+
+  animation: coreFloat 2.4s
+    infinite ease-in-out;
+}
+
+/* =========================
+애니메이션
+========================= */
+
+@keyframes waveOuter {
+  0% {
+    transform: scale(0.92);
+    opacity: 0.45;
+  }
+
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(0.92);
+    opacity: 0.45;
+  }
+}
+
+@keyframes waveInner {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.35;
+  }
+
+  50% {
+    transform: scale(1.14);
+    opacity: 0.95;
+  }
+
+  100% {
+    transform: scale(0.9);
+    opacity: 0.35;
+  }
+}
+
+@keyframes ringPulse {
+  0% {
+    transform: scale(0.85);
+    opacity: 0.25;
+  }
+
+  50% {
+    transform: scale(1.18);
+    opacity: 0.85;
+  }
+
+  100% {
+    transform: scale(0.85);
+    opacity: 0.25;
+  }
+}
+
+@keyframes coreFloat {
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* =========================
+마이크 버튼
+========================= */
+
+.mic-btn {
+  position: absolute;
+
+  top: 72%;
+
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  width: 76px;
+
+  height: 76px;
+
+  border-radius: 24px;
+
+  border: none;
+
+  background: white;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  z-index: 10;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 8px 24px
+      rgba(0, 0, 0, 0.12);
+}
+
+.mic-btn img {
+  width: 34px;
+
+  height: 34px;
+}
+
+.mic-btn.active {
+  animation: micPulse 1.8s infinite;
+}
+
+@keyframes micPulse {
+  0% {
+    box-shadow:
+      0 0 0 0
+        rgba(255, 255, 255, 0.65),
+      0 8px 24px
+        rgba(0, 0, 0, 0.12);
+  }
+
+  70% {
+    box-shadow:
+      0 0 0 18px
+        rgba(255, 255, 255, 0),
+      0 8px 24px
+        rgba(0, 0, 0, 0.12);
+  }
+
+  100% {
+    box-shadow:
+      0 0 0 0
+        rgba(255, 255, 255, 0),
+      0 8px 24px
+        rgba(0, 0, 0, 0.12);
+  }
+}
+
+/* =========================
+하단 버튼
+========================= */
+
+.stage-bottom {
+  position: absolute;
+
+  bottom: 54px;
+
+  left: 0;
+
+  width: 100%;
+
+  display: flex;
+
+  justify-content: center;
+
+  gap: 14px;
+
+  padding: 0 28px;
+
+  box-sizing: border-box;
+}
+
+/* 멈춤 */
+
+.btn-pause {
+  flex: 1;
+
+  height: 52px;
+
+  border-radius: 999px;
+
+  border: none;
+
+  background: rgba(
+    255,
+    255,
+    255,
+    0.85
+  );
+
+  color: #6c6259;
+
+  font-size: 16px;
+
+  font-weight: 700;
+
+  cursor: pointer;
+
+  backdrop-filter: blur(6px);
+}
+
+/* 끝내기 */
+
+.btn-end {
+  flex: 1.4;
+
+  height: 52px;
+
+  border-radius: 999px;
+
+  border: none;
+
+  background: linear-gradient(
+    90deg,
+    #69412a 0%,
+    #7a4a2d 100%
+  );
+
+  color: white;
+
+  font-size: 18px;
+
+  font-weight: 800;
+
+  cursor: pointer;
+
+  box-shadow:
+    0 6px 18px
+      rgba(90, 50, 20, 0.22);
+}
+
+/* 클릭 */
+
+.btn-pause:active,
+.btn-end:active {
+  transform: scale(0.97);
+}
+
+
+/* =========================
+얼굴
+========================= */
+
+.character-face {
+  position: absolute;
+
+  top: 50px;
+  left: 50%;
+
+  transform: translateX(-50%);
+
+  width: 58px;
+  height: 38px;
+
+  z-index: 5;
+}
+
+/* =========================
+눈
+========================= */
+
+.face-eye {
+  position: absolute;
+
+  width: 14px;
+  height: 8px;
+
+  border-top: 4px solid #6b3218;
+
+  border-radius: 999px;
+
+  top: 0;
+
+  transition: all 0.25s ease;
+}
+
+.face-eye.left {
+  left: 4px;
+
+  transform: rotate(-6deg);
+}
+
+.face-eye.right {
+  right: 4px;
+
+  transform: rotate(6deg);
+}
+
+/* =========================
+입
+========================= */
+
+.face-mouth {
+  position: absolute;
+
+  left: 50%;
+  top: 16px;
+
+  transform: translateX(-50%);
+
+  width: 30px;
+  height: 16px;
+
+  background: #6b3218;
+
+  border-radius:
+    0 0 999px 999px;
+
+  transition: all 0.25s ease;
+}
+/* =========================
+LISTENING
+========================= */
+
+.character-circle.listening
+  .character-face {
+  animation:
+    faceMove 1.2s infinite
+      ease-in-out,
+    blink 3s infinite;
+}
+
+/* =========================
+PROCESSING
+========================= */
+
+.character-circle.processing
+  .face-eye {
+  height: 2px;
+
+  border-top-width: 3px;
+}
+
+.character-circle.processing
+  .face-mouth {
+  width: 18px;
+  height: 8px;
+
+  top: 16px;
+
+  border-radius: 999px;
+
+  background: transparent;
+
+  border-bottom: 4px solid
+    #6b3218;
+}
+
+/* =========================
+PAUSED
+========================= */
+
+.character-circle.paused
+  .face-mouth {
+  width: 26px;
+  height: 4px;
+
+  border-radius: 999px;
+}
+
+/* =========================
+IDLE
+========================= */
+
+.character-circle.idle
+  .face-mouth {
+  width: 34px;
+  height: 16px;
+}
+
+/* =========================
+눈 깜빡임
+========================= */
+
+@keyframes blink {
+  0%,
+  45%,
+  47%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  46% {
+    transform: scaleY(0.1);
+  }
+}
+
+/* =========================
+얼굴 와리가리
+========================= */
+
+@keyframes faceMove {
+  0% {
+    transform:
+      translateX(-50%)
+      rotate(-4deg)
+      translateY(0px);
+  }
+
+  25% {
+    transform:
+      translateX(-50%)
+      rotate(3deg)
+      translateY(-2px);
+  }
+
+  50% {
+    transform:
+      translateX(-50%)
+      rotate(-2deg)
+      translateY(1px);
+  }
+
+  75% {
+    transform:
+      translateX(-50%)
+      rotate(4deg)
+      translateY(-1px);
+  }
+
+  100% {
+    transform:
+      translateX(-50%)
+      rotate(-4deg)
+      translateY(0px);
+  }
+}

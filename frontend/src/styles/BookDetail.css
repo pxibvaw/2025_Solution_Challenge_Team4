@@ -1,0 +1,477 @@
+/* src/styles/BookDetail.css */
+
+.book-detail-page {
+  width: 420px;
+
+  margin: 0 auto;
+
+  min-height: 100vh;
+
+  background: #f9f5ee;
+
+  padding: 56px 28px 220px;
+
+  box-sizing: border-box;
+
+  font-family: "SF Pro Rounded";
+}
+
+/* =========================
+   상단
+========================= */
+
+.book-detail-header {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 76px;
+}
+
+.book-detail-left {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+}
+
+/* 뒤로가기 */
+
+.book-detail-back {
+  border: none;
+
+  background: transparent;
+
+  padding: 0;
+
+  margin: 0;
+
+  width: 24px;
+
+  height: 24px;
+
+  min-width: 24px;
+
+  min-height: 24px;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  cursor: pointer;
+
+  appearance: none;
+
+  -webkit-appearance: none;
+
+  flex-shrink: 0;
+}
+
+
+.book-detail-back-icon {
+  width: 24px;
+
+  height: 24px;
+
+  min-width: 24px;
+
+  min-height: 24px;
+
+  object-fit: contain;
+
+  display: block;
+}
+
+/* 제목 */
+
+.book-detail-top-title {
+  color: var(
+    --Color-Brown-Dark,
+    #4a3a2d
+  );
+
+  font-family: "SF Pro Rounded";
+
+  font-size: 24px;
+
+  font-style: normal;
+
+  font-weight: 700;
+
+  line-height: 140%;
+
+  margin: 0;
+}
+
+/* 편집 공유 */
+
+.book-detail-actions {
+  display: flex;
+
+  gap: 18px;
+}
+
+.book-detail-action-btn {
+  border: none;
+
+  background: transparent;
+
+  color: var(
+    --Color-Brown-Dark,
+    #4a3a2d
+  );
+
+  font-family: "SF Pro Rounded";
+
+  font-size: 19.733px;
+
+  font-style: normal;
+
+  font-weight: 700;
+
+  line-height: 160%;
+
+  cursor: pointer;
+
+  padding: 0;
+}
+
+/* =========================
+   책
+========================= */
+
+.book-detail-cover-section {
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  margin-bottom: 40px;
+}
+
+/* 카드 */
+
+.book-detail-book-card {
+  position: relative;
+
+  width: 244px;
+
+  height: 340px;
+
+  border-radius: 16px;
+
+  overflow: hidden;
+
+  background: #fff;
+
+  box-shadow:
+    0 6px 18px
+      rgba(0, 0, 0, 0.08),
+    0 2px 4px
+      rgba(0, 0, 0, 0.04);
+
+  margin-bottom: 28px;
+}
+
+/* 표지 */
+
+.book-detail-book-cover {
+  width: 244px;
+
+  height: 340px;
+
+  border-radius: 16px;
+
+  position: relative;
+
+  overflow: hidden;
+
+  box-shadow:
+    inset 0 -10px 20px
+      rgba(0, 0, 0, 0.04),
+    0 10px 18px
+      rgba(0, 0, 0, 0.08);
+}
+
+.book-detail-book-cover::before {
+  content: "";
+
+  position: absolute;
+
+  left: 14px;
+
+  top: 0;
+
+  width: 6px;
+
+  height: 100%;
+
+  background: rgba(
+    0,
+    0,
+    0,
+    0.08
+  );
+}
+
+/* =========================
+   제목
+========================= */
+
+.book-detail-title {
+  color: var(
+    --Color-Brown-Medium,
+    #5c4a3a
+  );
+
+  text-align: center;
+
+  font-family: "SF Pro Rounded";
+
+  font-size: 20px;
+
+  font-style: normal;
+
+  font-weight: 700;
+
+  line-height: 150%;
+
+  margin: 0 0 6px;
+}
+
+/* 날짜 */
+
+.book-detail-date {
+  color: var(
+    --Color-Brown-Medium,
+    #5c4a3a
+  );
+
+  font-family: "SF Pro Rounded";
+
+  font-size: 16px;
+
+  font-style: normal;
+
+  font-weight: 500;
+
+  line-height: 150%;
+
+  margin: 0;
+
+  text-align: center;
+
+  min-width: 140px;
+}
+
+/* divider */
+
+.book-detail-divider {
+  width: 100%;
+
+  height: 1px;
+
+  background: #ddd0c1;
+
+  margin-bottom: 34px;
+}
+
+/* =========================
+   댓글
+========================= */
+
+.book-detail-comment-title {
+  color: #4a3a2d;
+
+  font-size: 20px;
+
+  font-weight: 700;
+
+  margin: 0 0 18px;
+}
+
+.book-detail-comment-list {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 16px;
+}
+
+.book-detail-comment-card {
+  background: rgba(
+    255,
+    255,
+    255,
+    0.7
+  );
+
+  border-radius: 18px;
+
+  padding: 18px;
+
+  box-shadow: 0 4px 12px
+    rgba(0, 0, 0, 0.04);
+}
+
+.book-detail-comment-top {
+  display: flex;
+
+  justify-content: space-between;
+
+  gap: 12px;
+}
+
+.book-detail-comment-user {
+  display: flex;
+
+  gap: 12px;
+}
+
+.book-detail-comment-avatar {
+  width: 36px;
+
+  height: 36px;
+
+  border-radius: 50%;
+
+  background: #9aa57f;
+
+  color: white;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  font-size: 16px;
+
+  font-weight: 700;
+
+  flex-shrink: 0;
+}
+
+.book-detail-comment-name-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin-bottom: 6px;
+}
+
+.book-detail-comment-name {
+  color: #4a3a2d;
+
+  font-size: 16px;
+
+  font-weight: 700;
+}
+
+.book-detail-comment-time {
+  color: #9d8d7f;
+
+  font-size: 12px;
+
+  font-weight: 500;
+}
+
+.book-detail-comment-content {
+  color: #4a3a2d;
+
+  font-size: 15px;
+
+  line-height: 150%;
+
+  margin: 0;
+}
+
+/* 아이콘 */
+
+.book-detail-comment-icons {
+  display: flex;
+
+  gap: 8px;
+
+  flex-shrink: 0;
+}
+
+.book-detail-icon {
+  width: 24px;
+
+  height: 24px;
+
+  object-fit: contain;
+}
+
+/* =========================
+   하단 읽어보기 버튼
+========================= */
+
+.book-detail-read-bottom {
+  position: fixed;
+
+  bottom: 84px;
+
+  left: 50.9%;
+
+  transform: translateX(-50%);
+
+  width: 100%;
+
+  max-width: 420px;
+
+  padding: 16px 24px;
+
+  box-sizing: border-box;
+
+  background: #f9f5ee;
+
+  z-index: 998;
+}
+
+.book-detail-read-btn {
+  width: 100%;
+
+  height: 56px;
+
+  border: none;
+
+  border-radius: 999px;
+
+  background: #6e5847;
+
+  color: white;
+
+  font-family: "SF Pro Rounded";
+
+  font-size: 20px;
+
+  font-style: normal;
+
+  font-weight: 700;
+
+  line-height: 140%;
+
+  cursor: pointer;
+}
+
+/* =========================
+   empty
+========================= */
+
+.book-detail-empty {
+  padding: 80px 24px;
+
+  text-align: center;
+
+  color: #7a6a5c;
+}

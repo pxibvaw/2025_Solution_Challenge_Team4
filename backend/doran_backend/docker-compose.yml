@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: doran-postgres
+    environment:
+      POSTGRES_DB: doran
+      POSTGRES_USER: doran
+      POSTGRES_PASSWORD: doran
+    ports:
+      - "15432:5432"
+    volumes:
+      - doran-postgres-data:/var/lib/postgresql/data
+
+volumes:
+  doran-postgres-data:

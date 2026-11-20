@@ -1,0 +1,231 @@
+/* =========================
+   페이지
+========================= */
+
+.library-month-page {
+  padding-top: 56px;
+}
+
+/* =========================
+   상단
+========================= */
+
+.library-month-top {
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  margin-bottom: 24px;
+}
+
+.library-back-btn {
+  border: none;
+
+  background: transparent;
+
+  color: #4a3a2d;
+
+  font-size: 24px;
+
+  cursor: pointer;
+
+  padding: 0;
+
+  line-height: 1;
+}
+
+.library-month-main-title {
+  color: #4a3a2d;
+
+  font-size: 24px;
+
+  font-weight: 700;
+
+  margin: 0;
+}
+
+/* =========================
+   배너
+========================= */
+
+.library-month-banner {
+  position: relative;
+
+  overflow: hidden;
+
+  width: 100%;
+
+  height: 126px;
+
+  border-radius: 28px;
+
+  margin-bottom: 22px;
+
+  padding: 22px;
+
+  box-sizing: border-box;
+
+  background:
+    radial-gradient(
+      circle at top left,
+      rgba(255, 255, 255, 0.24)
+        0%,
+      transparent 40%
+    ),
+    linear-gradient(
+      135deg,
+      #ffb48a 0%,
+      #ff9d70 45%,
+      #ffca8e 100%
+    );
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+}
+
+.library-month-banner::after {
+  content: "";
+
+  position: absolute;
+
+  right: -18px;
+  bottom: -18px;
+
+  width: 140px;
+  height: 140px;
+
+  background: rgba(
+    255,
+    255,
+    255,
+    0.12
+  );
+
+  border-radius: 50%;
+}
+
+/* 배너 내용 */
+
+.library-month-banner-content {
+  position: relative;
+
+  z-index: 2;
+}
+
+.library-month-banner-title {
+  color: white;
+
+  font-size: 16px;
+
+  font-weight: 700;
+
+  line-height: 140%;
+
+  margin: 0 0 10px;
+}
+
+.library-month-banner-count {
+  color: white;
+
+  font-size: 26px;
+
+  font-weight: 700;
+
+  margin: 0;
+}
+
+/* 책 이미지 */
+
+.library-month-banner-book {
+  position: relative;
+
+  z-index: 2;
+
+  width: 66px;
+
+  object-fit: contain;
+}
+
+/* =========================
+   필터
+========================= */
+
+.library-month-filter-row {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  gap: 14px;
+
+  margin-bottom: 26px;
+}
+
+/* 최신순 버튼 */
+
+.library-month-filter-btn {
+  border: none;
+
+  background: transparent;
+
+  color: #7d6c5d;
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  cursor: pointer;
+
+  padding: 0;
+
+  width: 74px;
+
+  flex-shrink: 0;
+
+  text-align: left;
+}
+
+/* 검색 */
+
+.library-month-search {
+  width: 100%;
+
+  height: 46px;
+
+  border-radius: 16px;
+
+  border: 1.5px solid #ddd0c1;
+
+  background: rgba(
+    255,
+    255,
+    255,
+    0.5
+  );
+
+  padding: 0 16px;
+
+  box-sizing: border-box;
+
+  font-size: 13px;
+
+  outline: none;
+}
+
+/* =========================
+   empty
+========================= */
+
+.library-month-empty {
+  color: #9c8d7e;
+
+  font-size: 15px;
+
+  margin-top: 40px;
+}
