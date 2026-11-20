@@ -1,5 +1,6 @@
 # Doran  
-> Voice-first Autobiography & Memory Recording Service
+> Voice-first Autobiography & Memory Recording Service  
+> 2026 Google Solution Challenge · GDG on Campus Sookmyung
 
 ---
 
@@ -75,10 +76,32 @@ Doran은 단순한 Q&A AI가 아닌, **말벗이자 기록 파트너**를 지향
 
 ## 🧠 Tech Highlights
 
-- Speech-to-Text (STT)
-- 대화 요약 및 에피소드 분리
-- 자서전 생성 (서사 구조화)
-- 사용자 맥락 기반 메모리 관리
+- **음성 대화 파이프라인**: 브라우저 녹음(MediaRecorder) → ffmpeg 16kHz mono 변환 → Google Speech-to-Text → 대화 응답 생성 → Google Text-to-Speech 음성 재생
+- **대화 오케스트레이션**: 공감 → 회상 유도 → 확장 질문 흐름과 상황별 지침(질문만 반복하지 않기, 감정 발화에는 공감)을 시스템 프롬프트로 설계
+- **장기 기억**: ChromaDB 기반 조건부 기억 조회로 이전 대화 맥락을 반영한 질문 생성
+- **에피소드 → 자서전**: 대화 로그에서 에피소드를 추출·병합하고, 선택한 에피소드로 자서전(chapters/pages) 생성. 10턴마다 백그라운드 중간 추출
+- **장애 복원력**: AI → BE 콜백에 Circuit Breaker + Outbox 재시도 패턴 적용, 요청 ID 기반 중복 응답 캐시
+
+---
+
+## 🛠️ Tech Stack
+
+| 구분 | 기술 |
+|---|---|
+| AI | Python, FastAPI, Gemini API, ChromaDB, Google STT / TTS, ffmpeg |
+| Backend | Spring Boot (Gradle), PostgreSQL (Docker) |
+| Frontend | React, Vite, TypeScript |
+
+---
+
+## 👥 Team
+
+| 파트 | 담당 |
+|---|---|
+| AI · 최종 통합 | 최윤서 (대화 엔진·에피소드/자서전 파이프라인, STT/TTS·ChromaDB 연동, FE–BE–AI 통합) |
+| Backend | gunu |
+| Frontend | dy0401kwon |
+| Design | UI/UX 디자인 |
 
 ---
 
@@ -86,23 +109,27 @@ Doran은 단순한 Q&A AI가 아닌, **말벗이자 기록 파트너**를 지향
 
 ```text
 root/
-├── frontend/      # Client
-├── backend/       # Server API
-├── ai/            # AI Pipeline
+├── frontend/          # Client (React + Vite)
+├── backend/           # Server API (Spring Boot)
+├── ai/                # AI Pipeline (FastAPI)
+├── data/              # 로컬 데이터 (ChromaDB 등, git 제외)
+├── docs/              # FE·BE·AI 연동 가이드
+├── requirements.txt
 ├── README.md
 └── .gitignore
+```
 
 ---
 
-## 통합 브랜치 로컬 실행 가이드
+## 로컬 실행 가이드
 
-이 섹션은 `feat/full-integration` 기준입니다. 프론트엔드, 백엔드, AI 코드가 한 레포에 합쳐진 상태에서 로컬로 화면과 API를 확인하는 방법입니다.
+프론트엔드, 백엔드, AI 코드가 한 레포에 합쳐진 `main` 기준입니다.
 
 ### 1. 브랜치 확인
 
 ```bash
-git switch feat/full-integration
-git pull origin feat/full-integration
+git switch main
+git pull origin main
 ```
 
 ### 2. PostgreSQL 실행
@@ -182,7 +209,7 @@ cd frontend
 npm run build
 ```
 
-현재 통합 브랜치에서 확인된 상태:
+통합 후 확인된 상태:
 
 ```text
 backend ./gradlew test: 성공
@@ -223,9 +250,9 @@ docs/BACKEND_INTEGRATION_GUIDE.md
 docs/DORAN_INTEGRATION_GUIDE.md
 ```
 
-### 8. 주의사항
+### 8. 현재 상태
 
+- 음성 대화(STT → 대화 → TTS), 에피소드 생성, 자서전 생성·조회 흐름이 FE–BE–AI 코드로 연결되어 있습니다.
+- 실제 AI·음성 기능을 쓰려면 백엔드를 `AI_SERVICE_ENABLED=true`로 실행하고, AI 서버에 Google Cloud 서비스 계정 키와 ffmpeg가 필요합니다. 키 파일은 저장소에 포함하지 않습니다.
 - 카카오 로그인은 아직 실제 OAuth/JWT 연동 전입니다.
-- 프론트의 mock 데이터 제거/디자인 수정은 FE 담당자가 처리합니다.
-- 실제 AI 응답, 자서전 생성 품질, 이미지 생성, 음성/STT/TTS는 AI 담당 파트와 추가 연동이 필요합니다.
 - `node_modules/`, `dist/`, 백엔드 build 산출물은 커밋하지 않습니다.
