@@ -51,7 +51,8 @@ Doran은 단순한 Q&A AI가 아닌, **말벗이자 기록 파트너**를 지향
 ## 🖥️ Screen Walkthrough
 
 <p align="center">
-  <img src="docs/images/doran_screens.png" alt="Doran 주요 화면: 메인 홈, 인터뷰룸, 에피소드 선택, 자서전 리더" width="100%" />
+  <img src="<img width="1784" height="951" alt="doran_screens" src="https://github.com/user-attachments/assets/0dcb3f00-a695-4565-a4c0-4c0fc91eb650" />
+" alt="Doran 주요 화면: 메인 홈, 인터뷰룸, 에피소드 선택, 자서전 리더" width="100%" />
 </p>
 <p align="center"><sub>메인 홈 · 인터뷰룸(이야기 듣는 중) · 에피소드 선택 · 자서전 리더 — 디자인 시안(Figma)</sub></p>
 
