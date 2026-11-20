@@ -100,7 +100,7 @@ Doran은 단순한 Q&A AI가 아닌, **말벗이자 기록 파트너**를 지향
 
 | 파트 | 담당 |
 |---|---|
-| AI · 최종 통합 | pxibvaw 대화 엔진·에피소드/자서전 파이프라인, STT/TTS·ChromaDB 연동, FE–BE-AI 연동 |
+| AI · 전체 연동 | pxibvaw |
 | Backend | gunu |
 | Frontend | dy0401kwon |
 | Design | UI/UX 디자인 |
