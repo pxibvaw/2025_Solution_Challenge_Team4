@@ -50,6 +50,11 @@ Doran은 단순한 Q&A AI가 아닌, **말벗이자 기록 파트너**를 지향
 
 ## 🖥️ Screen Walkthrough
 
+<p align="center">
+  <img src="docs/images/doran_screens.png" alt="Doran 주요 화면: 메인 홈, 인터뷰룸, 에피소드 선택, 자서전 리더" width="100%" />
+</p>
+<p align="center"><sub>메인 홈 · 인터뷰룸(이야기 듣는 중) · 에피소드 선택 · 자서전 리더 — 디자인 시안(Figma)</sub></p>
+
 ### 1. Onboarding
 - 최초 1회 진행
 - 사용자 맞춤 대화를 위한 기본 정보 설정
@@ -98,7 +103,7 @@ Doran은 단순한 Q&A AI가 아닌, **말벗이자 기록 파트너**를 지향
 
 | 파트 | 담당 |
 |---|---|
-| AI · 최종 통합 | 최윤서 (대화 엔진·에피소드/자서전 파이프라인, STT/TTS·ChromaDB 연동, FE–BE–AI 통합) |
+| AI · 최종 통합 | pxibvaw 대화 엔진·에피소드/자서전 파이프라인, STT/TTS·ChromaDB 연동, FE–BE-AI 연동 |
 | Backend | gunu |
 | Frontend | dy0401kwon |
 | Design | UI/UX 디자인 |
